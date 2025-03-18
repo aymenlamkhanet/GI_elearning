@@ -22,7 +22,7 @@ const Navbar = () => {
     {
       title: "Accueil",
       icon: <FiHome />,
-      link: "/dashboard",
+      link: "/",
     },
     {
       title: "Bibliothèques",
