@@ -1,9 +1,8 @@
 pipeline {
     agent any
 
-    environment {
-        // Define environment variables if needed
-        NODE_VERSION = '16' // Specify the Node.js version
+    tools {
+        nodejs 'NodeJS-16' // Use the Node.js installation configured in Jenkins
     }
 
     stages {
@@ -17,18 +16,7 @@ pipeline {
             }
         }
 
-        // Stage 2: Set up Node.js environment
-        stage('Set Up Node.js') {
-            steps {
-                script {
-                    echo 'Setting up Node.js environment...'
-                    sh "nvm install ${NODE_VERSION}"
-                    sh "nvm use ${NODE_VERSION}"
-                }
-            }
-        }
-
-        // Stage 3: Install dependencies
+        // Stage 2: Install dependencies
         stage('Install Dependencies') {
             steps {
                 script {
@@ -38,7 +26,7 @@ pipeline {
             }
         }
 
-        // Stage 4: Run tests
+        // Stage 3: Run tests
         stage('Run Tests') {
             steps {
                 script {
@@ -50,7 +38,6 @@ pipeline {
     }
 
     post {
-        // Post-build actions
         success {
             echo 'Pipeline succeeded!'
         }
@@ -59,7 +46,7 @@ pipeline {
         }
         always {
             echo 'Cleaning up workspace...'
-            cleanWs() // Clean the workspace after the build
+            cleanWs()
         }
     }
 }
