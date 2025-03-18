@@ -2,6 +2,11 @@ import React, { useState, useEffect } from "react";
 import img1 from "./img/pexels-pixabay-247322.jpg";
 import img2 from "./img/pexels-italo-melo-881954-2379005.jpg";
 import img3 from "./img/pexels-vinicius-wiesehofer-289347-1130626.jpg";
+import img4 from "./img/pexels-moh-adbelghaffar-764529.jpg";
+import img5 from "./img/pexels-brynna-spencer-63356-227294.jpg";
+import img6 from "./img/pexels-lolarussian-1855582.jpg";
+import img7 from "./img/pexels-moose-photos-170195-1587009.jpg";
+import img8 from "./img/pexels-olly-762020.jpg";
 
 const TestimonialsSection = () => {
   const testimonials = [
@@ -25,6 +30,42 @@ const TestimonialsSection = () => {
       image: img3,
       quote:
         "The recommendation system is amazing! It helped me discover resources that perfectly matched my learning needs. I especially appreciate the exam preparation materials.",
+    },
+    // Additional testimonials
+    {
+      name: "Imane Kaddouri",
+      role: "Software Engineering Student",
+      image: img4,
+      quote:
+        "The interactive coding challenges pushed me to think differently. I've improved my problem-solving skills tremendously and landed an internship at a top tech company!",
+    },
+    {
+      name: "Prof. Nadia El Ouazzani",
+      role: "Department Chair, Computer Engineering",
+      image: img5,
+      quote:
+        "This platform bridges the gap between theoretical knowledge and practical application. My students are more engaged than ever and show remarkable improvement in their projects.",
+    },
+    {
+      name: "Aroua Tazi",
+      role: "Recent Graduate & Junior Developer",
+      image: img6,
+      quote:
+        "I credit this platform for helping me transition from student to professional. The career resources and industry-focused projects gave me exactly what I needed to succeed in interviews.",
+    },
+    {
+      name: "Amina Bouali",
+      role: "Distance Learning Student",
+      image: img7,
+      quote:
+        "As someone studying remotely, this platform has been invaluable. The virtual labs and collaborative features make me feel connected to my peers despite the physical distance.",
+    },
+    {
+      name: "Dr. Hassan Mekouar",
+      role: "AI Research Scientist",
+      image: img8,
+      quote:
+        "The advanced courses are comprehensive and up-to-date with the latest developments in machine learning and artificial intelligence. I recommend this to all my research assistants.",
     },
   ];
 

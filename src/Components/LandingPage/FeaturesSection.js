@@ -132,22 +132,22 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+    <section className="py-24 bg-gray-950 relative overflow-hidden">
       {/* Decorative elements */}
-      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-gray-100 to-transparent"></div>
-      <div className="absolute -left-24 top-1/4 w-64 h-64 bg-indigo-50 rounded-full"></div>
-      <div className="absolute -right-24 bottom-1/4 w-80 h-80 bg-blue-50 rounded-full"></div>
+      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-gray-900 to-transparent"></div>
+      <div className="absolute -left-24 top-1/4 w-64 h-64 bg-blue-900/20 rounded-full blur-lg"></div>
+      <div className="absolute -right-24 bottom-1/4 w-80 h-80 bg-purple-900/20 rounded-full blur-lg"></div>
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
-          <div className="inline-block px-3 py-1 bg-indigo-50 rounded-full text-indigo-600 text-sm font-semibold mb-4">
+          <div className="inline-block px-3 py-1 bg-gray-800 rounded-full text-blue-400 text-sm font-semibold mb-4">
             POWERFUL FEATURES
           </div>
-          <h2 className="text-4xl font-bold mb-6">
+          <h2 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
             Everything You Need to Excel
           </h2>
           <div className="mx-auto max-w-2xl">
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-400">
               Our platform provides all the tools and resources computer science
               students need to succeed in their academic journey.
             </p>

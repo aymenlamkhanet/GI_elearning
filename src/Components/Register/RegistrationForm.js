@@ -191,69 +191,7 @@ const RegistrationForm = () => {
         <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-full filter blur-3xl animate-float-delayed"></div>
       </section>
 
-      {/* Modified Section: Why Choose Us - Now with matching background */}
-      <section className="relative py-24 bg-gradient-to-br from-gray-900 to-gray-950 overflow-hidden">
-        {/* Floating grid pattern */}
-        <div className="absolute inset-0 bg-grid-white/[0.05]"></div>
-
-        {/* Glowing border effect */}
-        <div className="absolute inset-0 border-2 border-white/5 rounded-xl pointer-events-none animate-border-pulse"></div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 animate-text-gradient">
-              Why Choose Our Platform?
-            </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Discover the unique features that make us the best choice for your
-              learning journey.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="relative bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10 shadow-2xl group hover:shadow-xl transition-shadow">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-75 group-hover:opacity-100 animate-glow -z-10"></div>
-              <div className="text-4xl mb-4 text-blue-500">📚</div>
-              <h3 className="text-xl font-bold mb-4 text-white">
-                Comprehensive Courses
-              </h3>
-              <p className="text-gray-400">
-                Access a wide range of well-structured courses designed by
-                experts.
-              </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="relative bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10 shadow-2xl group hover:shadow-xl transition-shadow">
-              <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-2xl blur-xl opacity-75 group-hover:opacity-100 animate-glow -z-10"></div>
-              <div className="text-4xl mb-4 text-purple-500">💡</div>
-              <h3 className="text-xl font-bold mb-4 text-white">
-                Interactive Learning
-              </h3>
-              <p className="text-gray-400">
-                Engage with hands-on exercises and real-world projects.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="relative bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10 shadow-2xl group hover:shadow-xl transition-shadow">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-75 group-hover:opacity-100 animate-glow -z-10"></div>
-              <div className="text-4xl mb-4 text-indigo-500">🚀</div>
-              <h3 className="text-xl font-bold mb-4 text-white">
-                Career Support
-              </h3>
-              <p className="text-gray-400">
-                Get career guidance and job placement assistance.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Floating 3D elements */}
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-full filter blur-3xl animate-float"></div>
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full filter blur-3xl animate-float-delayed"></div>
-      </section>
+      
 
       {/* Footer Section */}
       <FooterSection />
