@@ -5,14 +5,12 @@ import {
   FiFileText,
   FiInfo,
   FiBriefcase,
-  FiMail,
   FiMenu,
   FiX,
   FiChevronDown,
 } from "react-icons/fi";
 
 import logo from "./imgs/alien-svgrepo-com.svg"
-import img from "./imgs/download.jpeg"
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,7 +28,11 @@ const Navbar = () => {
       submenu: [
         { title: "Biblio-Concours", icon: <FiBook />, link: "#" },
         { title: "Biblio-Classiques", icon: <FiBook />, link: "#" },
-        { title: "Biblio-Ouvrages", icon: <FiBook />, link: "#" },
+        {
+          title: "Biblio-Ouvrages",
+          icon: <FiBook />,
+          link: "/biblio_ouvrages",
+        },
         { title: "Biblio-Fiches", icon: <FiBook />, link: "#" },
       ],
     },
@@ -56,8 +58,8 @@ const Navbar = () => {
       title: "Divers",
       icon: <FiBriefcase />,
       submenu: [
-        { title: "Équipe", link: "#" },
-        { title: "Partenaires", link: "#" },
+        { title: "Équipe", link: "/team" },
+        { title: "Partenaires", link: "/Partenaires" },
       ],
     },
   ];

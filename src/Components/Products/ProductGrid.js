@@ -4,6 +4,11 @@ import React, { useState } from "react";
 import ProductCard from "./ProductCard";
 import { FiFilter, FiSearch, FiChevronDown } from "react-icons/fi";
 import img from "./imgs/download.jpeg";
+import img1 from "./imgs/images.jpeg"
+import img2 from "./imgs/download (1).jpeg";
+import img3 from "./imgs/download (2).jpeg";
+import img4 from "./imgs/download (3).jpeg";
+import img5 from "./imgs/download.png";
 
 const ProductGrid = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,7 +36,7 @@ const ProductGrid = () => {
       difficulty: "Beginner",
       rating: 4.8,
       duration: "8h 15m",
-      image: "/images/course2.jpg",
+      image: img1,
       reviews: 38,
     },
     {
@@ -42,7 +47,7 @@ const ProductGrid = () => {
       difficulty: "Intermediate",
       rating: 4.2,
       duration: "320 pages",
-      image: "/images/book1.jpg",
+      image: img2,
       reviews: 25,
     },
     {
@@ -53,7 +58,7 @@ const ProductGrid = () => {
       difficulty: "Advanced",
       rating: 4.0,
       duration: "2h 00m",
-      image: "/images/exam1.jpg",
+      image: img3,
       reviews: 18,
     },
     {
@@ -64,7 +69,7 @@ const ProductGrid = () => {
       difficulty: "Beginner",
       rating: 4.6,
       duration: "50 problems",
-      image: "/images/exercise1.jpg",
+      image: img4,
       reviews: 56,
     },
     {
@@ -75,7 +80,7 @@ const ProductGrid = () => {
       difficulty: "Intermediate",
       rating: 4.7,
       duration: "4h 45m",
-      image: "/images/guide1.jpg",
+      image: img5,
       reviews: 33,
     },
   ];

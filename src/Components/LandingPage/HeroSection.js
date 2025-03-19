@@ -1,6 +1,10 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+
+  const navigate = useNavigate();
+
   useEffect(() => {
     // Simple animation for background particles
     const canvas = document.getElementById("hero-canvas");
@@ -73,7 +77,10 @@ const HeroSection = () => {
               excellence.
             </p>
             <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-              <button className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-3 px-8 rounded-xl hover:shadow-lg hover:shadow-blue-500/50 transform hover:-translate-y-1 transition-all duration-300">
+              <button
+                onClick={() => navigate("/items")}
+                className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-3 px-8 rounded-xl hover:shadow-lg hover:shadow-blue-500/50 transform hover:-translate-y-1 transition-all duration-300"
+              >
                 Get Started
               </button>
               <button className="bg-white/10 backdrop-blur-sm border border-white/20 py-3 px-8 rounded-xl hover:bg-white/20 transition-all duration-300">
