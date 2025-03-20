@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./RegistrationForm.css";
 import FooterSection from "../LandingPage/FooterSection";
+import Navbar from "../Products/Navbar";
 
 const RegistrationForm = () => {
   const [isSignUp, setIsSignUp] = useState(true); // true = Sign Up, false = Sign In
@@ -33,6 +34,7 @@ const RegistrationForm = () => {
 
   return (
     <>
+      <Navbar/>
       {/* Registration Form Section */}
       <section className="relative py-24 bg-gradient-to-br from-gray-900 to-gray-950 overflow-hidden">
         {/* Floating grid pattern */}

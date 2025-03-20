@@ -14,12 +14,14 @@ import CourseDashboard from "./Components/Cours&Exos/CourseDashboard";
 import OrientationPage from "./Components/Conseils/OrientationPage";
 import DoubleDiplomation from "./Components/Conseils/DoubleDiplomation";
 import ExchangePage from "./Components/Conseils/ExchangePage";
+import AdminDashboard from "./Components/Dashboard/AdminDashboard";
 
 const App = () => {
   return (
     <Router>
       <Routes>
         <Route path="/algos" element={<AlgorithmsPage />} />
+        <Route path="/AdminDashboard" element={<AdminDashboard/>}/>
         <Route path="/ExchangePage" element={<ExchangePage />} />
         <Route path="/DoubleDiplomation" element={<DoubleDiplomation />} />
         <Route path="/OrientationPage" element={<OrientationPage />} />

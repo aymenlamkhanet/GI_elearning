@@ -96,7 +96,7 @@ const Navbar = () => {
             </div>
             <div className="flex flex-col">
               <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                GI E-Learning
+                GI elearning
               </span>
               <span className="text-xs text-gray-400">ENSA Khouribga</span>
             </div>
