@@ -26,32 +26,40 @@ const Navbar = () => {
       title: "Bibliothèques",
       icon: <FiBook />,
       submenu: [
-        { title: "Biblio-Concours", icon: <FiBook />, link: "#" },
-        { title: "Biblio-Classiques", icon: <FiBook />, link: "#" },
+        {
+          title: "Biblio-Concours",
+          icon: <FiBook />,
+          link: "/Biblio-Concours",
+        },
+        { title: "Algorithmes", icon: <FiBook />, link: "/algos" },
         {
           title: "Biblio-Ouvrages",
           icon: <FiBook />,
           link: "/biblio_ouvrages",
         },
-        { title: "Biblio-Fiches", icon: <FiBook />, link: "#" },
+        { title: "Biblio-Fiches", icon: <FiBook />, link: "/BiblioFiches" },
       ],
     },
     {
       title: "Cours & Exos",
       icon: <FiFileText />,
       submenu: [
-        { title: "Cours & Exos (SUP)", icon: <FiFileText />, link: "#" },
-        { title: "Cours & Exos (SPE)", icon: <FiFileText />, link: "#" },
+        {
+          title: "Cours & Exos (GI-1)",
+          icon: <FiFileText />,
+          link: "/CourseDashboard",
+        },
+        { title: "Cours & Exos (GI-2)", icon: <FiFileText />, link: "#" },
+        { title: "Cours & Exos (GI-3)", icon: <FiFileText />, link: "#" },
       ],
     },
     {
-      title: "Infos Prépa",
+      title: "Infos MI",
       icon: <FiInfo />,
       submenu: [
-        { title: "Tipe & Conseils", link: "#" },
-        { title: "Visa & Campus France", link: "#" },
-        { title: "Notices & Résultats CNC", link: "#" },
-        { title: "Orientation CNC & CF", link: "#" },
+        { title: "Fileres & Conseils", link: "/OrientationPage" },
+        { title: "Double Diplomation", link: "/DoubleDiplomation" },
+        { title: "Echange", link: "/ExchangePage" },
       ],
     },
     {

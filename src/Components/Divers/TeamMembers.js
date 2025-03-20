@@ -2,6 +2,8 @@ import React from "react";
 import { FiLinkedin, FiGithub, FiTwitter, FiMail } from "react-icons/fi";
 import Navbar from "../Products/Navbar";
 import FooterSection from "../LandingPage/FooterSection";
+import ana from "./WhatsApp Image 2024-12-12 at 23.55.44_14762e88.jpg"
+import ihab from "./WhatsApp Image 2025-03-19 at 21.33.57_bfc9e5f0.jpg";
 
 const TeamMembers = () => {
   const teamMembers = [
@@ -9,7 +11,7 @@ const TeamMembers = () => {
       name: "Aymen Lamkhanet",
       role: "Etudiant 2eme annee en Genie Informatique",
       bio: "Passionné de technologies web (MERN & JEE) , DevOps",
-      image: "https://i.pravatar.cc/300?img=11",
+      image: ana,
       social: {
         linkedin: "https://linkedin.com/in/username",
         github: "https://github.com/username",
@@ -21,7 +23,7 @@ const TeamMembers = () => {
       name: "Ihab Hilal",
       role: "Etudiant 2eme annee en Genie Informatique",
       bio: "Plus de 5 ans d'expérience dans la gestion de projets e-learning.",
-      image: "https://i.pravatar.cc/300?img=7",
+      image: ihab,
       social: {
         linkedin: "https://linkedin.com/in/username",
         github: "https://github.com/username",

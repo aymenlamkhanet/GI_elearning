@@ -1,6 +1,9 @@
 import React from "react";
 import Navbar from "../Products/Navbar";
 import FooterSection from "../LandingPage/FooterSection";
+import microsoft from "./microsoft-logo-svgrepo-com.svg";
+import sisco from "./cisco-svgrepo-com.svg";
+import orange from "./Orange_S.A.-Logo.wine.png";
 
 const Partenaires = () => {
   const partenaires = [
@@ -9,8 +12,15 @@ const Partenaires = () => {
       role: "Partenaire Technologique",
       description:
         "Collaboration stratégique dans le développement de solutions cloud et IA",
-      image:
-        "https://logos-world.net/wp-content/uploads/2020/04/Microsoft-Logo.png",
+      image: microsoft,
+      website: "https://microsoft.com",
+    },
+    {
+      name: "Orange ",
+      role: "Partenaire Technologique",
+      description:
+        "Collaboration stratégique dans le développement de solutions cloud et IA",
+      image: orange,
       website: "https://microsoft.com",
     },
     {
@@ -18,8 +28,7 @@ const Partenaires = () => {
       role: "Partenaire Réseaux",
       description:
         "Partenaire officiel pour les certifications réseau et infrastructure",
-      image:
-        "https://logos-world.net/wp-content/uploads/2020/11/Cisco-Logo.png",
+      image: sisco,
       website: "https://cisco.com",
     },
     // Add more partners as needed
