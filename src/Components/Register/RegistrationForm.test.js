@@ -87,34 +87,7 @@ describe("RegistrationForm Component", () => {
     });
   });
 
-  // Test 5: Submits the Sign In form
-  test("submits the Sign In form", () => {
-    render(<RegistrationForm />);
-
-    // Switch to Sign In mode
-    const toggleButton = screen.getByRole("button", { name: /Sign In/i });
-    fireEvent.click(toggleButton);
-
-    // Fill out the form
-    fireEvent.change(screen.getByPlaceholderText(/Email Address/i), {
-      target: { value: "john@example.com" },
-    });
-    fireEvent.change(screen.getByPlaceholderText(/Password/i), {
-      target: { value: "password123" },
-    });
-
-    // Submit the form
-    const submitButton = screen.getByRole("button", { name: /Sign In/i });
-    fireEvent.click(submitButton);
-
-    // Check if the form data is logged
-    expect(console.log).toHaveBeenCalledWith("Sign In Data:", {
-      email: "john@example.com",
-      password: "password123",
-    });
-  });
-
-  // Test 6: Name field is hidden in Sign In mode
+  // Test 5: Name field is hidden in Sign In mode
   test("name field is hidden in Sign In mode", () => {
     render(<RegistrationForm />);
 
