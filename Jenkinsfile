@@ -26,6 +26,7 @@ pipeline {
             steps {
                 script {
                     echo 'Installing dependencies...'
+                    sh 'npm --version' 
                     sh 'npm install'
                 }
             }
