@@ -27,14 +27,14 @@ describe("RegistrationForm Component", () => {
     expect(screen.getByText(/Join the Revolution/i)).toBeInTheDocument();
 
     // Click the toggle button to switch to Sign In mode
-    const toggleButton = screen.getByText(/Sign In/i);
+    const toggleButton = screen.getByRole("button", { name: /Sign In/i });
     fireEvent.click(toggleButton);
 
     // Now, it should be in Sign In mode
     expect(screen.getByText(/Welcome Back/i)).toBeInTheDocument();
 
     // Click the toggle button again to switch back to Sign Up mode
-    fireEvent.click(screen.getByText(/Sign Up/i));
+    fireEvent.click(screen.getByRole("button", { name: /Sign Up/i }));
     expect(screen.getByText(/Join the Revolution/i)).toBeInTheDocument();
   });
 
@@ -74,7 +74,9 @@ describe("RegistrationForm Component", () => {
     });
 
     // Submit the form
-    const submitButton = screen.getByText(/Create Account/i);
+    const submitButton = screen.getByRole("button", {
+      name: /Create Account/i,
+    });
     fireEvent.click(submitButton);
 
     // Check if the form data is logged
@@ -90,7 +92,7 @@ describe("RegistrationForm Component", () => {
     render(<RegistrationForm />);
 
     // Switch to Sign In mode
-    const toggleButton = screen.getByText(/Sign In/i);
+    const toggleButton = screen.getByRole("button", { name: /Sign In/i });
     fireEvent.click(toggleButton);
 
     // Fill out the form
@@ -102,7 +104,7 @@ describe("RegistrationForm Component", () => {
     });
 
     // Submit the form
-    const submitButton = screen.getByText(/Sign In/i);
+    const submitButton = screen.getByRole("button", { name: /Sign In/i });
     fireEvent.click(submitButton);
 
     // Check if the form data is logged
@@ -117,7 +119,7 @@ describe("RegistrationForm Component", () => {
     render(<RegistrationForm />);
 
     // Switch to Sign In mode
-    const toggleButton = screen.getByText(/Sign In/i);
+    const toggleButton = screen.getByRole("button", { name: /Sign In/i });
     fireEvent.click(toggleButton);
 
     // Check if the name field is not in the document
