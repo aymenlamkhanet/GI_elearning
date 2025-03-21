@@ -6,6 +6,10 @@ pipeline {
         NODE_VERSION = '16' // Specify the Node.js version
     }
 
+    tools {
+        nodejs 'NodeJS-16' // Use the NodeJS plugin with the installation name configured in Jenkins
+    }
+
     stages {
         // Stage 1: Clone the repository
         stage('Clone Repository') {
@@ -17,8 +21,7 @@ pipeline {
             }
         }
 
-
-        // Stage 3: Install dependencies
+        // Stage 2: Install dependencies
         stage('Install Dependencies') {
             steps {
                 script {
@@ -28,7 +31,7 @@ pipeline {
             }
         }
 
-        // Stage 4: Run tests
+        // Stage 3: Run tests
         stage('Run Tests') {
             steps {
                 script {
