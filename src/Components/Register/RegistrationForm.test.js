@@ -3,6 +3,16 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import RegistrationForm from "./RegistrationForm";
 
 describe("RegistrationForm Component", () => {
+  // Mock console.log before each test
+  beforeEach(() => {
+    jest.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  // Restore console.log after each test
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   // Test 1: Renders the component without crashing
   test("renders without crashing", () => {
     render(<RegistrationForm />);
@@ -67,7 +77,7 @@ describe("RegistrationForm Component", () => {
     const submitButton = screen.getByText(/Create Account/i);
     fireEvent.click(submitButton);
 
-    // Check if the form data is logged (you can mock console.log if needed)
+    // Check if the form data is logged
     expect(console.log).toHaveBeenCalledWith("Sign Up Data:", {
       name: "John Doe",
       email: "john@example.com",
