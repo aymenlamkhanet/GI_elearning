@@ -2,16 +2,14 @@ pipeline {
     agent any
 
     environment {
-        // Define environment variables if needed
-        NODE_VERSION = '16' // Specify the Node.js version
+        NODE_VERSION = '20.15.0' // Update to match the Node.js version
     }
 
     tools {
-        nodejs 'NodeJS-16' // Use the NodeJS plugin with the installation name configured in Jenkins
+        nodejs 'NodeJs20.15.0' // Use the correct installation name
     }
 
     stages {
-        // Stage 1: Clone the repository
         stage('Clone Repository') {
             steps {
                 script {
@@ -21,18 +19,16 @@ pipeline {
             }
         }
 
-        // Stage 2: Install dependencies
         stage('Install Dependencies') {
             steps {
                 script {
                     echo 'Installing dependencies...'
-                    sh 'npm --version' 
+                    sh 'npm --version'
                     sh 'npm install'
                 }
             }
         }
 
-        // Stage 3: Run tests
         stage('Run Tests') {
             steps {
                 script {
@@ -44,7 +40,6 @@ pipeline {
     }
 
     post {
-        // Post-build actions
         success {
             echo 'Pipeline succeeded!'
         }
@@ -53,7 +48,7 @@ pipeline {
         }
         always {
             echo 'Cleaning up workspace...'
-            cleanWs() // Clean the workspace after the build
+            cleanWs()
         }
     }
 }
