@@ -14,75 +14,41 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                script {
-                    echo 'Cloning the repository...'
-                    git branch: 'main', url: 'https://github.com/aymenlamkhanet/GI_elearning.git'
-                }
+                git branch: 'main', url: 'https://github.com/aymenlamkhanet/GI_elearning.git'
             }
         }
 
-        stage('Prepare Environment') {
+        stage('Setup Node') {
             steps {
-                script {
-                    echo 'Setting up Node.js environment...'
-                    sh '''
-                        apk add --no-cache curl bash
-                        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
-                        export NVM_DIR="$HOME/.nvm"
-                        [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh"
-                        nvm install ${NODE_VERSION}
-                        npm install -g npm@latest
-                    '''
-                }
+                sh 'apk add --no-cache nodejs npm'
+                sh 'npm install -g npm@latest'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                script {
-                    echo 'Installing dependencies...'
-                    sh '''
-                        node --version
-                        npm --version
-                        npm install
-                    '''
-                }
+                sh 'npm install'
             }
         }
 
         stage('Run Tests') {
             steps {
-                script {
-                    echo 'Running tests...'
-                    sh 'npm test'
-                }
+                sh 'npm test'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo 'Building Docker image...'
-                    sh """
-                        docker build -t ${DOCKER_IMAGE_NAME}:${BUILD_NUMBER} -f frontend/Dockerfile .
-                        docker images | grep ${DOCKER_IMAGE_NAME}
-                    """
+                    docker.build("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}", "-f frontend/Dockerfile .")
                 }
             }
         }
     }
 
     post {
-        success {
-            echo 'Pipeline succeeded!'
-        }
-        failure {
-            echo 'Pipeline failed!'
-        }
         always {
-            echo 'Cleaning up workspace...'
-            cleanWs()
-            sh 'docker system prune -f'
+            deleteDir() // Use this instead of cleanWs
         }
     }
 }
