@@ -1,13 +1,14 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker:24.0-cli'
+            args '-v /var/run/docker.sock:/var/run/docker.sock --privileged'
+        }
+    }
 
     environment {
         NODE_VERSION = '20.15.0'
         DOCKER_IMAGE_NAME = 'gi-elearning-frontend'
-    }
-
-    tools {
-        nodejs 'NodeJs20.15.0'
     }
 
     stages {
@@ -20,12 +21,31 @@ pipeline {
             }
         }
 
+        stage('Prepare Environment') {
+            steps {
+                script {
+                    echo 'Setting up Node.js environment...'
+                    sh '''
+                        apk add --no-cache curl bash
+                        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+                        export NVM_DIR="$HOME/.nvm"
+                        [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh"
+                        nvm install ${NODE_VERSION}
+                        npm install -g npm@latest
+                    '''
+                }
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 script {
                     echo 'Installing dependencies...'
-                    sh 'npm --version'
-                    sh 'npm install'
+                    sh '''
+                        node --version
+                        npm --version
+                        npm install
+                    '''
                 }
             }
         }
@@ -43,7 +63,10 @@ pipeline {
             steps {
                 script {
                     echo 'Building Docker image...'
-                    docker.build("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}", "-f frontend/Dockerfile .")
+                    sh """
+                        docker build -t ${DOCKER_IMAGE_NAME}:${BUILD_NUMBER} -f frontend/Dockerfile .
+                        docker images | grep ${DOCKER_IMAGE_NAME}
+                    """
                 }
             }
         }
@@ -59,8 +82,7 @@ pipeline {
         always {
             echo 'Cleaning up workspace...'
             cleanWs()
+            sh 'docker system prune -f'
         }
     }
 }
-
-
