@@ -2,11 +2,12 @@ pipeline {
     agent any
 
     environment {
-        NODE_VERSION = '20.15.0' // Update to match the Node.js version
+        NODE_VERSION = '20.15.0'
+        DOCKER_IMAGE_NAME = 'gi-elearning-frontend'
     }
 
     tools {
-        nodejs 'NodeJs20.15.0' // Use the correct installation name
+        nodejs 'NodeJs20.15.0'
     }
 
     stages {
@@ -37,6 +38,15 @@ pipeline {
                 }
             }
         }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo 'Building Docker image...'
+                    docker.build("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}", "-f frontend/Dockerfile .")
+                }
+            }
+        }
     }
 
     post {
@@ -52,3 +62,5 @@ pipeline {
         }
     }
 }
+
+
