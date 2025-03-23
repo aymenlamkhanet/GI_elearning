@@ -2,14 +2,16 @@ pipeline {
     agent any
 
     environment {
-        NODE_VERSION = '20.15.0' // Update to match the Node.js version
+        NODE_VERSION = '20.15.0'              // Node.js version
+        DOCKER_IMAGE = "my-app:${env.BUILD_ID}" // Docker image name with unique build ID
     }
 
     tools {
-        nodejs 'NodeJs20.15.0' // Use the correct installation name
+        nodejs 'NodeJs20.15.0' 
     }
 
     stages {
+        // Stage 1: Clone Repository
         stage('Clone Repository') {
             steps {
                 script {
@@ -19,6 +21,7 @@ pipeline {
             }
         }
 
+        // Stage 2: Install Dependencies
         stage('Install Dependencies') {
             steps {
                 script {
@@ -29,6 +32,7 @@ pipeline {
             }
         }
 
+        // Stage 3: Run Tests
         stage('Run Tests') {
             steps {
                 script {
@@ -37,14 +41,25 @@ pipeline {
                 }
             }
         }
+
+        // Stage 4: Build Docker Image
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo 'Building Docker image...'
+                    docker.build("${DOCKER_IMAGE}")
+                }
+            }
+        }
+
     }
 
     post {
         success {
-            echo 'Pipeline succeeded!'
+            echo 'Pipeline succeeded! 🎉'
         }
         failure {
-            echo 'Pipeline failed!'
+            echo 'Pipeline failed! ❌'
         }
         always {
             echo 'Cleaning up workspace...'
