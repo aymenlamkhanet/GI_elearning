@@ -1,54 +1,54 @@
 pipeline {
-    agent {
-        docker {
-            image 'docker:24.0-cli'
-            args '-v /var/run/docker.sock:/var/run/docker.sock --privileged'
-        }
-    }
+    agent any
 
     environment {
-        NODE_VERSION = '20.15.0'
-        DOCKER_IMAGE_NAME = 'gi-elearning-frontend'
+        NODE_VERSION = '20.15.0' // Update to match the Node.js version
+    }
+
+    tools {
+        nodejs 'NodeJs20.15.0' // Use the correct installation name
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/aymenlamkhanet/GI_elearning.git'
-            }
-        }
-
-        stage('Setup Node') {
-            steps {
-                sh 'apk add --no-cache nodejs npm'
-                sh 'npm install -g npm@latest'
+                script {
+                    echo 'Cloning the repository...'
+                    git branch: 'main', url: 'https://github.com/aymenlamkhanet/GI_elearning.git'
+                }
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                script {
+                    echo 'Installing dependencies...'
+                    sh 'npm --version'
+                    sh 'npm install'
+                }
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'npm test'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
                 script {
-                    docker.build("${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}", "-f frontend/Dockerfile .")
+                    echo 'Running tests...'
+                    sh 'npm test'
                 }
             }
         }
     }
 
     post {
+        success {
+            echo 'Pipeline succeeded!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
         always {
-            deleteDir() // Use this instead of cleanWs
+            echo 'Cleaning up workspace...'
+            cleanWs()
         }
     }
 }
