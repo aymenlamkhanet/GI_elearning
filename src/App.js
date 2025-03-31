@@ -20,15 +20,16 @@ const App = () => {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/AdminDashboard" element={<AdminDashboard />} />
+
         <Route path="/algos" element={<AlgorithmsPage />} />
-        <Route path="/AdminDashboard" element={<AdminDashboard/>}/>
         <Route path="/ExchangePage" element={<ExchangePage />} />
         <Route path="/DoubleDiplomation" element={<DoubleDiplomation />} />
         <Route path="/OrientationPage" element={<OrientationPage />} />
         <Route path="/CourseDashboard" element={<CourseDashboard />} />
         <Route path="/BiblioFiches" element={<BiblioFichesPage />} />
         <Route path="/Biblio-Concours" element={<ConcoursPage />} />
-        <Route path="/" element={<LandingPage />} />
         <Route path="/About" element={<AboutPage />} />
         <Route path="/Partenaires" element={<Partenaires />} />
         <Route path="/team" element={<TeamMembers />} />
