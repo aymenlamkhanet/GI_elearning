@@ -44,6 +44,12 @@ pipeline {
 
         // Stage 4: Build Docker Image
         stage('Build Docker Image') {
+            agent {
+                docker {
+                    image 'docker:stable'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
                 script {
                     echo 'Building Docker image...'
@@ -51,7 +57,6 @@ pipeline {
                 }
             }
         }
-
     }
 
     post {
