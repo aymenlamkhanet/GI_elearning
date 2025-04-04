@@ -15,6 +15,7 @@ import OrientationPage from "./Components/Conseils/OrientationPage";
 import DoubleDiplomation from "./Components/Conseils/DoubleDiplomation";
 import ExchangePage from "./Components/Conseils/ExchangePage";
 import AdminDashboard from "./Components/Dashboard/AdminDashboard";
+import ProfDashboard from "./Components/Privatespace/Prof/ProfDashboard";
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
         <Route path="/" element={<LandingPage />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
 
+        <Route path="/ProfDashboard" element={<ProfDashboard />} />
         <Route path="/algos" element={<AlgorithmsPage />} />
         <Route path="/ExchangePage" element={<ExchangePage />} />
         <Route path="/DoubleDiplomation" element={<DoubleDiplomation />} />
