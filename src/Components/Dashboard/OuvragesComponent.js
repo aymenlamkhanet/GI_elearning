@@ -1,181 +1,123 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import AjoutOuvrage from "./AjoutOuvrage";
+import UpdateOuvrage from "./UpdateOuvrage";
 import {
   PlusCircle,
   Search,
   BookOpen,
   Library,
   Clock,
-  User,
   Hash,
   MoreVertical,
   Edit,
   Trash2,
+  Code,
+  Globe,
+  Server,
+  LineChart,
+  Coffee,
+  Star,
+  Users,
 } from "lucide-react";
 
 const OuvragesComponent = () => {
-  // Sample book data
-  const [books, setBooks] = useState([
-    {
-      id: 1,
-      title: "L'Intelligence Artificielle pour les Débutants",
-      author: "Marie Dupont",
-      category: "Technologie",
-      isbn: "978-3-16-148410-0",
-      publicationDate: "2023-03-15",
-      pages: 328,
-      status: "Disponible",
-      cover: "https://source.unsplash.com/featured/800x600?book,ai",
-    },
-    {
-      id: 2,
-      title: "Les Fondements du Deep Learning",
-      author: "Jean Leroy",
-      category: "Data Science",
-      isbn: "978-1-23-456789-7",
-      publicationDate: "2024-01-20",
-      pages: 452,
-      status: "Emprunté",
-      cover: "https://source.unsplash.com/featured/800x600?book,neural",
-    },
-    {
-      id: 3,
-      title: "Cybersécurité: Protéger vos Données",
-      author: "Lucie Martin",
-      category: "Sécurité",
-      isbn: "978-2-45-678901-2",
-      publicationDate: "2022-11-10",
-      pages: 275,
-      status: "Disponible",
-      cover: "https://source.unsplash.com/featured/800x600?book,security",
-    },
-    {
-      id: 4,
-      title: "Introduction au Machine Learning",
-      author: "Édouard Petit",
-      category: "Data Science",
-      isbn: "978-4-56-789012-3",
-      publicationDate: "2023-07-22",
-      pages: 390,
-      status: "Emprunté",
-      cover:
-        "https://source.unsplash.com/featured/800x600?book,machinelearning",
-    },
-    {
-      id: 5,
-      title: "Blockchain: L'avenir des Transactions",
-      author: "Amélie Rousseau",
-      category: "Technologie Financière",
-      isbn: "978-5-67-890123-4",
-      publicationDate: "2024-02-05",
-      pages: 312,
-      status: "Disponible",
-      cover: "https://source.unsplash.com/featured/800x600?book,blockchain",
-    },
-    {
-      id: 6,
-      title: "Le Guide du Big Data",
-      author: "Pierre Garnier",
-      category: "Data Science",
-      isbn: "978-6-78-901234-5",
-      publicationDate: "2023-09-18",
-      pages: 420,
-      status: "En réparation",
-      cover: "https://source.unsplash.com/featured/800x600?book,data",
-    },
-    {
-      id: 7,
-      title: "Python pour la Science des Données",
-      author: "Sophie Lemaire",
-      category: "Programmation",
-      isbn: "978-7-89-012345-6",
-      publicationDate: "2023-05-30",
-      pages: 365,
-      status: "Disponible",
-      cover: "https://source.unsplash.com/featured/800x600?book,python",
-    },
-    {
-      id: 8,
-      title: "Les Réseaux Neurones en Pratique",
-      author: "Antoine Moreau",
-      category: "Intelligence Artificielle",
-      isbn: "978-8-90-123456-7",
-      publicationDate: "2024-03-01",
-      pages: 285,
-      status: "Emprunté",
-      cover: "https://source.unsplash.com/featured/800x600?book,network",
-    },
-    {
-      id: 9,
-      title: "Cloud Computing Moderne",
-      author: "Camille Dubois",
-      category: "Informatique",
-      isbn: "978-9-01-234567-8",
-      publicationDate: "2023-12-12",
-      pages: 330,
-      status: "Disponible",
-      cover: "https://source.unsplash.com/featured/800x600?book,cloud",
-    },
-    {
-      id: 10,
-      title: "Robotique et IA: La Nouvelle Frontière",
-      author: "Thomas Legrand",
-      category: "Robotique",
-      isbn: "978-0-12-345678-9",
-      publicationDate: "2024-04-20",
-      pages: 410,
-      status: "Emprunté",
-      cover: "https://source.unsplash.com/featured/800x600?book,robot",
-    },
-    {
-      id: 11,
-      title: "L'Éthique de l'IA",
-      author: "Élise Perrin",
-      category: "Philosophie Technologique",
-      isbn: "978-1-34-567890-1",
-      publicationDate: "2023-08-15",
-      pages: 290,
-      status: "Disponible",
-      cover: "https://source.unsplash.com/featured/800x600?book,ethics",
-    },
-    {
-      id: 12,
-      title: "Développement Web Avancé",
-      author: "Nicolas Bertrand",
-      category: "Programmation",
-      isbn: "978-2-45-678901-2",
-      publicationDate: "2024-05-10",
-      pages: 375,
-      status: "En commande",
-      cover: "https://source.unsplash.com/featured/800x600?book,web",
-    },
-    {
-      id: 13,
-      title: "La Transformation Digitale des Entreprises",
-      author: "Laura Fontaine",
-      category: "Management Technologique",
-      isbn: "978-3-56-789012-3",
-      publicationDate: "2023-10-25",
-      pages: 320,
-      status: "Disponible",
-      cover: "https://source.unsplash.com/featured/800x600?book,digital",
-    },
-  ]);
+  const [books, setBooks] = useState([]);
+  const [modules, setModules] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch data from API
+  const fetchData = async () => {
+    try {
+      const [ouvragesRes, modulesRes] = await Promise.all([
+        fetch("http://localhost:8084/api/ouvrages"),
+        fetch("http://localhost:8084/api/ouvrages/modules/distinct"),
+      ]);
+
+      if (!ouvragesRes.ok || !modulesRes.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const ouvragesData = await ouvragesRes.json();
+      const modulesData = await modulesRes.json();
+
+      setBooks(ouvragesData);
+      setModules(modulesData);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshData = async () => {
+    try {
+      const [ouvragesRes, modulesRes] = await Promise.all([
+        fetch("http://localhost:8084/api/ouvrages"),
+        fetch("http://localhost:8084/api/ouvrages/modules/distinct"),
+      ]);
+
+      const ouvragesData = await ouvragesRes.json();
+      const modulesData = await modulesRes.json();
+
+      setBooks(ouvragesData);
+      setModules(modulesData);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet ouvrage ?")) {
+      try {
+        const response = await fetch(
+          `http://localhost:8084/api/ouvrages/${id}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              // Add any authorization headers if needed
+            },
+          }
+        );
+
+        if (response.ok) {
+          // Update local state only after successful API call
+          setBooks((prev) => prev.filter((b) => b.id !== id));
+          console.log("Ouvrage supprimé avec succès");
+        } else {
+          const errorText = await response.text();
+          console.error("Delete failed:", errorText);
+          alert(`Échec de la suppression: ${errorText}`);
+        }
+      } catch (error) {
+        console.error("Delete error:", error);
+        alert(`Erreur lors de la suppression: ${error.message}`);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   // State management
+  const [isAddOuvrageModalOpen, setIsAddOuvrageModalOpen] = useState(false);
+  const [isEditOuvrageModalOpen, setIsEditOuvrageModalOpen] = useState(false);
+  const [selectedOuvrageId, setSelectedOuvrageId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("Tous");
+  const [niveauFilter, setNiveauFilter] = useState("Tous");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
   // Filtering logic
   const filteredBooks = books.filter((book) => {
     const matchesSearch =
-      book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      book.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "Tous" || book.status === statusFilter;
-    return matchesSearch && matchesStatus;
+      book.titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.module.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesNiveau =
+      niveauFilter === "Tous" || book.niveau === niveauFilter;
+    return matchesSearch && matchesNiveau;
   });
 
   // Pagination logic
@@ -183,7 +125,32 @@ const OuvragesComponent = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentBooks = filteredBooks.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Action Menu Component
+  // Module to color mapping
+  const getModuleColors = (module) => {
+    const colors = {
+      Python: "from-blue-900 to-indigo-900",
+      "Web Development": "from-purple-900 to-fuchsia-900",
+      DevOps: "from-green-900 to-emerald-900",
+      "Data Science": "from-amber-900 to-orange-900",
+      Java: "from-red-900 to-pink-900",
+      default: "from-gray-900 to-slate-900",
+    };
+    return colors[module] || colors.default;
+  };
+
+  // Module to icon mapping
+  const getModuleIcon = (module) => {
+    const icons = {
+      Python: <Code className="w-16 h-16 text-blue-300" />,
+      "Web Development": <Globe className="w-16 h-16 text-purple-300" />,
+      DevOps: <Server className="w-16 h-16 text-green-300" />,
+      "Data Science": <LineChart className="w-16 h-16 text-amber-300" />,
+      Java: <Coffee className="w-16 h-16 text-red-300" />,
+      default: <BookOpen className="w-16 h-16 text-gray-300" />,
+    };
+    return icons[module] || icons.default;
+  };
+
   const ActionMenu = ({ onEdit, onDelete }) => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -198,13 +165,19 @@ const OuvragesComponent = () => {
         {isOpen && (
           <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
             <button
-              onClick={onEdit}
+              onClick={() => {
+                onEdit();
+                setIsOpen(false);
+              }}
               className="flex items-center w-full px-4 py-2 hover:bg-gray-700"
             >
               <Edit className="w-4 h-4 mr-2" /> Modifier
             </button>
             <button
-              onClick={onDelete}
+              onClick={() => {
+                onDelete();
+                setIsOpen(false);
+              }}
               className="flex items-center w-full px-4 py-2 text-red-400 hover:bg-gray-700"
             >
               <Trash2 className="w-4 h-4 mr-2" /> Supprimer
@@ -215,20 +188,113 @@ const OuvragesComponent = () => {
     );
   };
 
+  // Book Card Component
+  const BookCard = ({ book }) => (
+    <div className="group relative bg-gray-800/30 backdrop-blur-sm rounded-xl border border-white/10 hover:border-purple-400/30 transition-all overflow-hidden">
+      <div
+        className={`h-48 relative bg-gradient-to-br ${getModuleColors(
+          book.module
+        )}`}
+      >
+        <div className="absolute inset-0 opacity-20 flex items-center justify-center">
+          {getModuleIcon(book.module)}
+        </div>
+
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-4xl font-bold tracking-widest text-white/80">
+            {book.titre
+              .split(" ")
+              .map((w) => w[0])
+              .slice(0, 3)
+              .join("")}
+          </div>
+        </div>
+
+        <div className="absolute bottom-2 right-2 bg-black/40 px-2 py-1 rounded text-xs text-white">
+          v{book.version}
+        </div>
+
+        <div className="absolute top-2 right-2">
+          <ActionMenu
+            onEdit={() => {
+              setSelectedOuvrageId(book.id);
+              setIsEditOuvrageModalOpen(true);
+            }}
+            onDelete={() => handleDelete(book.id)}
+          />
+        </div>
+
+        {book.ratingAvg > 400 && (
+          <div className="absolute top-2 left-2 bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded-full text-xs flex items-center">
+            <Star className="w-3 h-3 mr-1" /> Popular
+          </div>
+        )}
+      </div>
+
+      <div className="p-6 space-y-4">
+        <div className="space-y-2">
+          <h3 className="text-xl font-semibold">{book.titre}</h3>
+          <p className="text-gray-400 text-sm line-clamp-2">
+            {book.description}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="flex items-center space-x-2">
+            <Library className="w-4 h-4 text-purple-400" />
+            <span>{book.module}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Clock className="w-4 h-4 text-blue-400" />
+            <span>{book.datePublication}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Hash className="w-4 h-4 text-green-400" />
+            <span>{book.ratingAvg} ratings</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <BookOpen className="w-4 h-4 text-yellow-400" />
+            <span>{book.nbrPages} pages</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Star className="w-4 h-4 text-amber-400" />
+            <span>{book.reviews} reviews</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Users className="w-4 h-4 text-cyan-400" />
+            <span>{book.niveau}</span>
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="px-2 py-1 bg-gray-700/50 rounded-full text-xs">
+            {book.module}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (loading)
+    return <div className="text-center py-8">Chargement en cours...</div>;
+  if (error)
+    return <div className="text-center py-8 text-red-400">Erreur: {error}</div>;
+
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
           Gestion des Ouvrages
         </h2>
-        <button className="flex items-center px-4 py-2 bg-purple-600/20 text-purple-400 rounded-lg hover:bg-purple-600/30 transition-all">
+        <button
+          onClick={() => setIsAddOuvrageModalOpen(true)}
+          className="flex items-center px-4 py-2 bg-purple-600/20 text-purple-400 rounded-lg hover:bg-purple-600/30 transition-all"
+        >
           <PlusCircle className="w-5 h-5 mr-2" />
           Ajouter un Ouvrage
         </button>
       </div>
 
-      {/* Search and Filters */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
           <input
@@ -242,87 +308,30 @@ const OuvragesComponent = () => {
         </div>
         <select
           className="px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          value={niveauFilter}
+          onChange={(e) => setNiveauFilter(e.target.value)}
         >
-          <option value="Tous">Tous les statuts</option>
-          <option value="Disponible">Disponible</option>
-          <option value="Emprunté">Emprunté</option>
-          <option value="Réservé">Réservé</option>
+          <option value="Tous">Tous les niveaux</option>
+          <option value="Gi1">Gi1</option>
+          <option value="Gi2">Gi2</option>
+          <option value="Gi3">Gi3</option>
         </select>
       </div>
 
-      {/* Books Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {currentBooks.map((book) => (
-          <div
+          <BookCard
             key={book.id}
-            className="group relative bg-gray-800/30 backdrop-blur-sm rounded-xl border border-white/10 hover:border-purple-400/30 transition-all overflow-hidden"
-          >
-            {/* Book Cover */}
-            <div className="h-48 bg-gray-700/50 relative">
-              <img
-                src={book.cover}
-                alt={book.title}
-                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-              />
-              <div className="absolute top-2 right-2">
-                <ActionMenu
-                  onEdit={() => console.log("Edit", book.id)}
-                  onDelete={() =>
-                    setBooks((prev) => prev.filter((b) => b.id !== book.id))
-                  }
-                />
-              </div>
-            </div>
-
-            {/* Book Details */}
-            <div className="p-6 space-y-4">
-              <div className="space-y-2">
-                <h3 className="text-xl font-semibold">{book.title}</h3>
-                <p className="text-gray-400 text-sm">{book.author}</p>
-              </div>
-
-              {/* Metadata */}
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center space-x-2">
-                  <Library className="w-4 h-4 text-purple-400" />
-                  <span>{book.category}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Clock className="w-4 h-4 text-blue-400" />
-                  <span>{book.publicationDate}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Hash className="w-4 h-4 text-green-400" />
-                  <span>{book.isbn}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <BookOpen className="w-4 h-4 text-yellow-400" />
-                  <span>{book.pages} pages</span>
-                </div>
-              </div>
-
-              {/* Status */}
-              <div className="flex items-center justify-between">
-                <span
-                  className={`px-2 py-1 rounded-full ${
-                    book.status === "Disponible"
-                      ? "bg-green-500/20 text-green-300"
-                      : book.status === "Emprunté"
-                      ? "bg-red-500/20 text-red-300"
-                      : "bg-yellow-500/20 text-yellow-300"
-                  }`}
-                >
-                  {book.status}
-                </span>
-              </div>
-            </div>
-          </div>
+            book={book}
+            onEdit={() => {
+              setSelectedOuvrageId(book.id);
+              setIsEditOuvrageModalOpen(true);
+            }}
+            onDelete={() => handleDelete(book.id)}
+          />
         ))}
       </div>
 
-      {/* Empty State */}
       {currentBooks.length === 0 && (
         <div className="text-center py-12 space-y-4">
           <BookOpen className="mx-auto w-12 h-12 text-purple-400 opacity-50" />
@@ -330,7 +339,6 @@ const OuvragesComponent = () => {
         </div>
       )}
 
-      {/* Pagination */}
       <div className="flex justify-between items-center">
         <span className="text-gray-400">
           Affichage {indexOfFirstItem + 1}-
@@ -354,6 +362,20 @@ const OuvragesComponent = () => {
           </button>
         </div>
       </div>
+      <AjoutOuvrage
+        isOpen={isAddOuvrageModalOpen}
+        onClose={() => setIsAddOuvrageModalOpen(false)}
+        modules={modules}
+        onOuvrageAdded={refreshData}
+      />
+
+      <UpdateOuvrage
+        isOpen={isEditOuvrageModalOpen}
+        onClose={() => setIsEditOuvrageModalOpen(false)}
+        ouvrageId={selectedOuvrageId}
+        modules={modules}
+        onOuvrageUpdated={refreshData}
+      />
     </div>
   );
 };

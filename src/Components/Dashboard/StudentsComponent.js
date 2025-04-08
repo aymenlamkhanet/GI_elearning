@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   PlusCircle,
   Search,
@@ -6,136 +6,74 @@ import {
   MoreVertical,
   Edit,
   Trash2,
+  Download,
 } from "lucide-react";
+import AjoutEtudiant from "./AjoutEtudiant";
+import UpdateEtudiant from "./UpdateEtudiant";
 
 const StudentsComponent = () => {
-  // Mock data with 12 students
-  const [students, setStudents] = useState([
-    {
-      id: 1,
-      name: "Émilie Rousseau",
-      email: "emilie@example.com",
-      status: "Actif",
-      course: "Informatique",
-      enrollmentDate: "2024-03-15",
-    },
-    {
-      id: 2,
-      name: "Lucas Moreau",
-      email: "lucas@example.com",
-      status: "Inactif",
-      course: "Mathématiques",
-      enrollmentDate: "2024-03-10",
-    },
-    {
-      id: 3,
-      name: "Camille Dubois",
-      email: "camille@example.com",
-      status: "Actif",
-      course: "Physique",
-      enrollmentDate: "2024-03-12",
-    },
-    {
-      id: 4,
-      name: "Antoine Leroy",
-      email: "antoine@example.com",
-      status: "Actif",
-      course: "Chimie",
-      enrollmentDate: "2024-03-08",
-    },
-    {
-      id: 5,
-      name: "Léa Martin",
-      email: "lea@example.com",
-      status: "Inactif",
-      course: "Biologie",
-      enrollmentDate: "2024-03-05",
-    },
-    {
-      id: 6,
-      name: "Hugo Bernard",
-      email: "hugo@example.com",
-      status: "Actif",
-      course: "Économie",
-      enrollmentDate: "2024-03-18",
-    },
-    {
-      id: 7,
-      name: "Manon Petit",
-      email: "manon@example.com",
-      status: "Actif",
-      course: "Droit",
-      enrollmentDate: "2024-03-20",
-    },
-    {
-      id: 8,
-      name: "Nathan Richard",
-      email: "nathan@example.com",
-      status: "Inactif",
-      course: "Philosophie",
-      enrollmentDate: "2024-03-22",
-    },
-    {
-      id: 9,
-      name: "Clara Durand",
-      email: "clara@example.com",
-      status: "Actif",
-      course: "Histoire",
-      enrollmentDate: "2024-03-25",
-    },
-    {
-      id: 10,
-      name: "Louis Lambert",
-      email: "louis@example.com",
-      status: "Actif",
-      course: "Géographie",
-      enrollmentDate: "2024-03-28",
-    },
-    {
-      id: 11,
-      name: "Chloé Morel",
-      email: "chloe@example.com",
-      status: "Inactif",
-      course: "Langues",
-      enrollmentDate: "2024-03-30",
-    },
-    {
-      id: 12,
-      name: "Enzo Girard",
-      email: "enzo@example.com",
-      status: "Actif",
-      course: "Arts",
-      enrollmentDate: "2024-04-01",
-    },
-  ]);
-
-  // State management
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("Tous");
+  const [levelFilter, setLevelFilter] = useState("Tous");
   const [sortConfig, setSortConfig] = useState({
-    key: "name",
+    key: "nom",
     direction: "asc",
   });
   const [currentPage, setCurrentPage] = useState(1);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedStudentId, setSelectedStudentId] = useState(null);
   const itemsPerPage = 8;
+
+  useEffect(() => {
+    console.log("Fetching students...");
+    refreshStudents();
+  }, []);
+
+  // And in refreshStudents
+  const refreshStudents = async () => {
+    try {
+      console.log("Starting fetch request");
+      const response = await fetch(
+        "http://localhost:8084/api/etudiant/AllEtudiants"
+      );
+      console.log("Response received:", response);
+      const data = await response.json();
+      console.log("Data received:", data);
+      setStudents(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error refreshing students:", error);
+      setError("Failed to fetch students");
+      setLoading(false);
+    }
+  };
 
   // Sorting logic
   const sortedStudents = [...students].sort((a, b) => {
-    if (a[sortConfig.key] < b[sortConfig.key])
+    if (a[sortConfig.key] < b[sortConfig.key]) {
       return sortConfig.direction === "asc" ? -1 : 1;
-    if (a[sortConfig.key] > b[sortConfig.key])
+    }
+    if (a[sortConfig.key] > b[sortConfig.key]) {
       return sortConfig.direction === "asc" ? 1 : -1;
+    }
     return 0;
   });
 
   // Filtering logic
   const filteredStudents = sortedStudents.filter((student) => {
+    const fullName = `${student.prenom} ${student.nom}`.toLowerCase();
     const matchesSearch =
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "Tous" || student.status === statusFilter;
-    return matchesSearch && matchesStatus;
+      fullName.includes(searchTerm.toLowerCase()) ||
+      student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.phone.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesLevel =
+      levelFilter === "Tous" || student.niveau === levelFilter;
+
+    return matchesSearch && matchesLevel;
   });
 
   // Pagination logic
@@ -146,13 +84,19 @@ const StudentsComponent = () => {
     indexOfLastItem
   );
 
+  // Extract unique levels for filter options
+  const levelOptions = [
+    "Tous",
+    ...new Set(students.map((student) => student.niveau)),
+  ];
+
   // Column headers
   const columns = [
-    { key: "name", label: "Nom" },
+    { key: "nom", label: "Nom" },
+    { key: "prenom", label: "Prénom" },
     { key: "email", label: "Email" },
-    { key: "course", label: "Filière" },
-    { key: "status", label: "Statut" },
-    { key: "enrollmentDate", label: "Date d'inscription" },
+    { key: "phone", label: "Téléphone" },
+    { key: "niveau", label: "Niveau" },
   ];
 
   // FilterSelect Component
@@ -177,7 +121,7 @@ const StudentsComponent = () => {
   );
 
   // ActionMenu Component
-  const ActionMenu = ({ onEdit, onDelete }) => {
+  const ActionMenu = ({ onEdit, onDelete, studentId }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -189,15 +133,21 @@ const StudentsComponent = () => {
           <MoreVertical className="w-5 h-5 text-gray-400" />
         </button>
         {isOpen && (
-          <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+          <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 z-20">
             <button
-              onClick={onEdit}
+              onClick={() => {
+                onEdit();
+                setIsOpen(false);
+              }}
               className="flex items-center w-full px-4 py-2 hover:bg-gray-700"
             >
               <Edit className="w-4 h-4 mr-2" /> Modifier
             </button>
             <button
-              onClick={onDelete}
+              onClick={() => {
+                onDelete();
+                setIsOpen(false);
+              }}
               className="flex items-center w-full px-4 py-2 text-red-400 hover:bg-gray-700"
             >
               <Trash2 className="w-4 h-4 mr-2" /> Supprimer
@@ -208,6 +158,11 @@ const StudentsComponent = () => {
     );
   };
 
+  if (loading)
+    return <div className="text-center py-8">Chargement en cours...</div>;
+  if (error)
+    return <div className="text-center py-8 text-red-400">Erreur: {error}</div>;
+
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Header Section */}
@@ -215,7 +170,10 @@ const StudentsComponent = () => {
         <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
           Gestion des Étudiants
         </h2>
-        <button className="flex items-center px-4 py-2 bg-purple-600/20 text-purple-400 rounded-lg hover:bg-purple-600/30 transition-all">
+        <button
+          className="flex items-center px-4 py-2 bg-purple-600/20 text-purple-400 rounded-lg hover:bg-purple-600/30 transition-all"
+          onClick={() => setIsAddModalOpen(true)}
+        >
           <PlusCircle className="w-5 h-5 mr-2" />
           Ajouter un Étudiant
         </button>
@@ -235,9 +193,9 @@ const StudentsComponent = () => {
         </div>
         <div className="flex gap-4">
           <FilterSelect
-            options={["Tous", "Actif", "Inactif"]}
-            selected={statusFilter}
-            onSelect={setStatusFilter}
+            options={levelOptions}
+            selected={levelFilter}
+            onSelect={setLevelFilter}
           />
         </div>
       </div>
@@ -276,66 +234,104 @@ const StudentsComponent = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-700">
-            {currentStudents.map((student) => (
-              <tr
-                key={student.id}
-                className="hover:bg-gray-700/10 transition-colors"
-              >
-                <td className="px-6 py-4">{student.name}</td>
-                <td className="px-6 py-4 text-gray-400">{student.email}</td>
-                <td className="px-6 py-4">{student.course}</td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-2 py-1 rounded-full ${
-                      student.status === "Actif"
-                        ? "bg-green-500/20 text-green-300"
-                        : "bg-red-500/20 text-red-300"
-                    }`}
-                  >
-                    {student.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4">{student.enrollmentDate}</td>
-                <td className="px-6 py-4 text-right">
-                  <ActionMenu
-                    onEdit={() => console.log("Edit", student.id)}
-                    onDelete={() =>
-                      setStudents((prev) =>
-                        prev.filter((s) => s.id !== student.id)
-                      )
-                    }
-                  />
+            {currentStudents.length > 0 ? (
+              currentStudents.map((student) => (
+                <tr
+                  key={student.id}
+                  className="hover:bg-gray-700/10 transition-colors"
+                >
+                  <td className="px-6 py-4">{student.nom}</td>
+                  <td className="px-6 py-4">{student.prenom}</td>
+                  <td className="px-6 py-4 text-gray-400">{student.email}</td>
+                  <td className="px-6 py-4">{student.phone}</td>
+                  <td className="px-6 py-4">
+                    <span className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full">
+                      {student.niveau}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <ActionMenu
+                      onEdit={() => {
+                        setSelectedStudentId(student.id);
+                        setIsEditModalOpen(true);
+                      }}
+                      onDelete={() => {
+                        fetch(
+                          `http://localhost:8084/api/etudiant/${student.id}`,
+                          {
+                            method: "DELETE",
+                          }
+                        )
+                          .then((response) => {
+                            if (response.ok) {
+                              setStudents((prev) =>
+                                prev.filter((s) => s.id !== student.id)
+                              );
+                            }
+                          })
+                          .catch((error) => {
+                            console.error("Error deleting student:", error);
+                          });
+                      }}
+                      studentId={student.id}
+                    />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={columns.length + 1}
+                  className="px-6 py-4 text-center text-gray-400"
+                >
+                  Aucun étudiant trouvé
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-between items-center">
-        <span className="text-gray-400">
-          Affichage {indexOfFirstItem + 1}-
-          {Math.min(indexOfLastItem, filteredStudents.length)} sur{" "}
-          {filteredStudents.length}
-        </span>
-        <div className="flex gap-2">
-          <button
-            className="px-3 py-1 bg-gray-800/50 rounded-lg hover:bg-gray-700/30 disabled:opacity-50"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((p) => p - 1)}
-          >
-            Précédent
-          </button>
-          <button
-            className="px-3 py-1 bg-gray-800/50 rounded-lg hover:bg-gray-700/30 disabled:opacity-50"
-            disabled={indexOfLastItem >= filteredStudents.length}
-            onClick={() => setCurrentPage((p) => p + 1)}
-          >
-            Suivant
-          </button>
+      {filteredStudents.length > 0 && (
+        <div className="flex justify-between items-center">
+          <span className="text-gray-400">
+            Affichage {indexOfFirstItem + 1}-
+            {Math.min(indexOfLastItem, filteredStudents.length)} sur{" "}
+            {filteredStudents.length}
+          </span>
+          <div className="flex gap-2">
+            <button
+              className="px-3 py-1 bg-gray-800/50 rounded-lg hover:bg-gray-700/30 disabled:opacity-50"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
+            >
+              Précédent
+            </button>
+            <button
+              className="px-3 py-1 bg-gray-800/50 rounded-lg hover:bg-gray-700/30 disabled:opacity-50"
+              disabled={indexOfLastItem >= filteredStudents.length}
+              onClick={() => setCurrentPage((p) => p + 1)}
+            >
+              Suivant
+            </button>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Modals */}
+      <AjoutEtudiant
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onStudentAdded={refreshStudents}
+      />
+
+      <UpdateEtudiant
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        studentId={selectedStudentId}
+        onStudentUpdated={refreshStudents}
+      />
     </div>
   );
 };

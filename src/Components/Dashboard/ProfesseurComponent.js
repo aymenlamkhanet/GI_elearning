@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import AjoutProfesseur from "./AjoutProfesseur";
+import UpdateProfesseur from "./UpdateProfesseur";
 import {
   PlusCircle,
   Search,
@@ -9,123 +11,39 @@ import {
 } from "lucide-react";
 
 const ProfesseurComponent = () => {
-  // Mock data with 12 professors
-  const [professeurs, setProfesseurs] = useState([
-    {
-      id: 1,
-      name: "Pierre Dubois",
-      email: "pierre@example.com",
-      department: "Informatique",
-      subjects: ["Algorithmique", "IA"],
-      status: "Actif",
-      joinDate: "2023-01-15",
-    },
-    {
-      id: 2,
-      name: "Sophie Martin",
-      email: "sophie@example.com",
-      department: "Mathématiques",
-      subjects: ["Algèbre", "Calcul"],
-      status: "Inactif",
-      joinDate: "2023-02-10",
-    },
-    {
-      id: 3,
-      name: "Lucie Lambert",
-      email: "lucie@example.com",
-      department: "Physique",
-      subjects: ["Mécanique", "Thermodynamique"],
-      status: "Actif",
-      joinDate: "2023-03-12",
-    },
-    {
-      id: 4,
-      name: "Antoine Rousseau",
-      email: "antoine@example.com",
-      department: "Chimie",
-      subjects: ["Chimie Organique", "Biochimie"],
-      status: "Actif",
-      joinDate: "2023-04-08",
-    },
-    {
-      id: 5,
-      name: "Émilie Leroy",
-      email: "emilie@example.com",
-      department: "Biologie",
-      subjects: ["Génétique", "Écologie"],
-      status: "Inactif",
-      joinDate: "2023-05-05",
-    },
-    {
-      id: 6,
-      name: "Hugo Bernard",
-      email: "hugo@example.com",
-      department: "Économie",
-      subjects: ["Macroéconomie", "Finance"],
-      status: "Actif",
-      joinDate: "2023-06-18",
-    },
-    {
-      id: 7,
-      name: "Manon Petit",
-      email: "manon@example.com",
-      department: "Droit",
-      subjects: ["Droit Civil", "Droit International"],
-      status: "Actif",
-      joinDate: "2023-07-20",
-    },
-    {
-      id: 8,
-      name: "Nathan Richard",
-      email: "nathan@example.com",
-      department: "Philosophie",
-      subjects: ["Éthique", "Logique"],
-      status: "Inactif",
-      joinDate: "2023-08-22",
-    },
-    {
-      id: 9,
-      name: "Clara Durand",
-      email: "clara@example.com",
-      department: "Histoire",
-      subjects: ["Histoire Moderne", "Archéologie"],
-      status: "Actif",
-      joinDate: "2023-09-25",
-    },
-    {
-      id: 10,
-      name: "Louis Moreau",
-      email: "louis@example.com",
-      department: "Géographie",
-      subjects: ["Géopolitique", "Climatologie"],
-      status: "Actif",
-      joinDate: "2023-10-28",
-    },
-    {
-      id: 11,
-      name: "Chloé Girard",
-      email: "chloe@example.com",
-      department: "Langues",
-      subjects: ["Anglais", "Espagnol"],
-      status: "Inactif",
-      joinDate: "2023-11-30",
-    },
-    {
-      id: 12,
-      name: "Enzo Lefevre",
-      email: "enzo@example.com",
-      department: "Arts",
-      subjects: ["Peinture", "Sculpture"],
-      status: "Actif",
-      joinDate: "2023-12-01",
-    },
-  ]);
+  const [professeurs, setProfesseurs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedProfesseurId, setSelectedProfesseurId] = useState(null);
+
+  const fetchProfesseurs = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:8084/api/professeur/AllProfesseurs"
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setProfesseurs(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfesseurs();
+  }, []);
 
   // State management
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("Tous");
   const [sortConfig, setSortConfig] = useState({
-    key: "name",
+    key: "nom",
     direction: "asc",
   });
   const [currentPage, setCurrentPage] = useState(1);
@@ -133,20 +51,28 @@ const ProfesseurComponent = () => {
 
   // Sorting logic
   const sortedProfesseurs = [...professeurs].sort((a, b) => {
-    if (a[sortConfig.key] < b[sortConfig.key])
+    if (a[sortConfig.key] < b[sortConfig.key]) {
       return sortConfig.direction === "asc" ? -1 : 1;
-    if (a[sortConfig.key] > b[sortConfig.key])
+    }
+    if (a[sortConfig.key] > b[sortConfig.key]) {
       return sortConfig.direction === "asc" ? 1 : -1;
+    }
     return 0;
   });
 
   // Filtering logic
   const filteredProfesseurs = sortedProfesseurs.filter((prof) => {
+    const fullName = `${prof.prenom} ${prof.nom}`.toLowerCase();
     const matchesSearch =
-      prof.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      prof.email.toLowerCase().includes(searchTerm.toLowerCase());
+      fullName.includes(searchTerm.toLowerCase()) ||
+      prof.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prof.phone.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Assuming you might want to add status later
     const matchesStatus =
-      statusFilter === "Tous" || prof.status === statusFilter;
+      statusFilter === "Tous" ||
+      (prof.status ? prof.status === statusFilter : true);
+
     return matchesSearch && matchesStatus;
   });
 
@@ -160,12 +86,11 @@ const ProfesseurComponent = () => {
 
   // Column headers
   const columns = [
-    { key: "name", label: "Nom" },
+    { key: "nom", label: "Nom" },
+    { key: "prenom", label: "Prénom" },
     { key: "email", label: "Email" },
-    { key: "department", label: "Département" },
-    { key: "subjects", label: "Matières" },
-    { key: "status", label: "Statut" },
-    { key: "joinDate", label: "Date d'adhésion" },
+    { key: "phone", label: "Téléphone" },
+    { key: "Module", label: "Module" },
   ];
 
   // FilterSelect Component
@@ -221,6 +146,11 @@ const ProfesseurComponent = () => {
     );
   };
 
+  if (loading)
+    return <div className="text-center py-8">Chargement en cours...</div>;
+  if (error)
+    return <div className="text-center py-8 text-red-400">Erreur: {error}</div>;
+
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Header Section */}
@@ -228,7 +158,10 @@ const ProfesseurComponent = () => {
         <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
           Gestion des Professeurs
         </h2>
-        <button className="flex items-center px-4 py-2 bg-purple-600/20 text-purple-400 rounded-lg hover:bg-purple-600/30 transition-all">
+        <button
+          className="flex items-center px-4 py-2 bg-purple-600/20 text-purple-400 rounded-lg hover:bg-purple-600/30 transition-all"
+          onClick={() => setIsAddModalOpen(true)}
+        >
           <PlusCircle className="w-5 h-5 mr-2" />
           Ajouter un Professeur
         </button>
@@ -289,80 +222,101 @@ const ProfesseurComponent = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-700">
-            {currentProfesseurs.map((prof) => (
-              <tr
-                key={prof.id}
-                className="hover:bg-gray-700/10 transition-colors"
-              >
-                <td className="px-6 py-4">{prof.name}</td>
-                <td className="px-6 py-4 text-gray-400">{prof.email}</td>
-                <td className="px-6 py-4">{prof.department}</td>
-                <td className="px-6 py-4">
-                  <div className="flex flex-wrap gap-2">
-                    {prof.subjects.map((subject, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 text-sm bg-gray-700/50 rounded-full"
-                      >
-                        {subject}
-                      </span>
-                    ))}
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-2 py-1 rounded-full ${
-                      prof.status === "Actif"
-                        ? "bg-green-500/20 text-green-300"
-                        : "bg-red-500/20 text-red-300"
-                    }`}
-                  >
-                    {prof.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4">{prof.joinDate}</td>
-                <td className="px-6 py-4 text-right">
-                  <ActionMenu
-                    onEdit={() => console.log("Edit", prof.id)}
-                    onDelete={() =>
-                      setProfesseurs((prev) =>
-                        prev.filter((p) => p.id !== prof.id)
-                      )
-                    }
-                  />
+            {currentProfesseurs.length > 0 ? (
+              currentProfesseurs.map((prof) => (
+                <tr
+                  key={prof.id}
+                  className="hover:bg-gray-700/10 transition-colors"
+                >
+                  <td className="px-6 py-4">{prof.nom}</td>
+                  <td className="px-6 py-4">{prof.prenom}</td>
+                  <td className="px-6 py-4 text-gray-400">{prof.email}</td>
+                  <td className="px-6 py-4">{prof.phone}</td>
+                  <td className="px-6 py-4">{prof.module ? prof.module : "Not Specified yet"}</td>
+                  <td className="px-6 py-4 text-right">
+                    <ActionMenu
+                      onEdit={() => {
+                        setSelectedProfesseurId(prof.id);
+                        setIsEditModalOpen(true);
+                      }}
+                      onDelete={async () => {
+                        try {
+                          await fetch(
+                            `http://localhost:8084/api/professeur/${prof.id}`,
+                            {
+                              method: "DELETE",
+                            }
+                          );
+                          setProfesseurs((prev) =>
+                            prev.filter((p) => p.id !== prof.id)
+                          );
+                        } catch (error) {
+                          console.error("Delete error:", error);
+                        }
+                      }}
+                    />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={columns.length + 1}
+                  className="px-6 py-4 text-center text-gray-400"
+                >
+                  Aucun professeur trouvé
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-between items-center">
-        <span className="text-gray-400">
-          Affichage {indexOfFirstItem + 1}-
-          {Math.min(indexOfLastItem, filteredProfesseurs.length)} sur{" "}
-          {filteredProfesseurs.length}
-        </span>
-        <div className="flex gap-2">
-          <button
-            className="px-3 py-1 bg-gray-800/50 rounded-lg hover:bg-gray-700/30 disabled:opacity-50"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((p) => p - 1)}
-          >
-            Précédent
-          </button>
-          <button
-            className="px-3 py-1 bg-gray-800/50 rounded-lg hover:bg-gray-700/30 disabled:opacity-50"
-            disabled={indexOfLastItem >= filteredProfesseurs.length}
-            onClick={() => setCurrentPage((p) => p + 1)}
-          >
-            Suivant
-          </button>
+      {filteredProfesseurs.length > 0 && (
+        <div className="flex justify-between items-center">
+          <span className="text-gray-400">
+            Affichage {indexOfFirstItem + 1}-
+            {Math.min(indexOfLastItem, filteredProfesseurs.length)} sur{" "}
+            {filteredProfesseurs.length}
+          </span>
+          <div className="flex gap-2">
+            <button
+              className="px-3 py-1 bg-gray-800/50 rounded-lg hover:bg-gray-700/30 disabled:opacity-50"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
+            >
+              Précédent
+            </button>
+            <button
+              className="px-3 py-1 bg-gray-800/50 rounded-lg hover:bg-gray-700/30 disabled:opacity-50"
+              disabled={indexOfLastItem >= filteredProfesseurs.length}
+              onClick={() => setCurrentPage((p) => p + 1)}
+            >
+              Suivant
+            </button>
+          </div>
         </div>
-      </div>
+      )}
+      <AjoutProfesseur
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onProfesseurAdded={() => {
+          // Implémenter la logique de rafraîchissement
+          fetchProfesseurs();
+        }}
+      />
+      <UpdateProfesseur
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        professeurId={selectedProfesseurId}
+        onProfesseurUpdated={() => {
+          fetchProfesseurs();
+        }}
+      />
     </div>
   );
 };
 
 export default ProfesseurComponent;
+ 

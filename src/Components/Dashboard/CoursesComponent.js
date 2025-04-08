@@ -1,93 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import UpdateCours from "./UpdateCours";
+import AjoutCours from "./AjoutCours";
 import {
   PlusCircle,
   Search,
-  ChevronDown,
   MoreVertical,
   Edit,
   Trash2,
+  Download,
 } from "lucide-react";
 
 const CoursesComponent = () => {
-  // Mock data with courses
-  const [courses, setCourses] = useState([
-    {
-      id: 1,
-      title: "Quantum AI Foundations",
-      category: "Tech",
-      duration: "6h 30m",
-      students: 245,
-      difficulty: "Advanced",
-      instructor: "Dr. Elena Nakamura",
-      status: "Actif",
-      addedDate: "2024-01-15",
-    },
-    {
-      id: 2,
-      title: "Generative AI Masterclass",
-      category: "Tech",
-      duration: "5h 15m",
-      students: 312,
-      difficulty: "Intermediate",
-      instructor: "Kai Zhang",
-      status: "Inactif",
-      addedDate: "2024-02-20",
-    },
-    {
-      id: 3,
-      title: "AI Ethics & Governance",
-      category: "Business",
-      duration: "4h 45m",
-      students: 189,
-      difficulty: "All Levels",
-      instructor: "Dr. Amara Okonkwo",
-      status: "Actif",
-      addedDate: "2024-03-10",
-    },
-    {
-      id: 4,
-      title: "Machine Learning Fundamentals",
-      category: "Tech",
-      duration: "7h 00m",
-      students: 420,
-      difficulty: "Beginner",
-      instructor: "Alex Rodriguez",
-      status: "Actif",
-      addedDate: "2024-04-05",
-    },
-    {
-      id: 5,
-      title: "Deep Learning Specialization",
-      category: "Tech",
-      duration: "8h 30m",
-      students: 276,
-      difficulty: "Advanced",
-      instructor: "Maria Silva",
-      status: "Inactif",
-      addedDate: "2024-05-12",
-    },
-    {
-      id: 6,
-      title: "AI Product Management",
-      category: "Business",
-      duration: "5h 00m",
-      students: 198,
-      difficulty: "Intermediate",
-      instructor: "John Smith",
-      status: "Actif",
-      addedDate: "2024-06-18",
-    },
-  ]);
-
-  // State management
+  const [isAddCourseModalOpen, setIsAddCourseModalOpen] = useState(false);
+  const [isEditCourseModalOpen, setIsEditCourseModalOpen] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState(null);
+  const [courses, setCourses] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("Tous");
   const [sortConfig, setSortConfig] = useState({
-    key: "title",
+    key: "titre",
     direction: "asc",
   });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+
+   const refreshCourses = async () => {
+     try {
+       const response = await fetch("http://localhost:8084/api/cours");
+       const data = await response.json();
+       setCourses(data);
+     } catch (error) {
+       console.error("Error refreshing courses:", error);
+     }
+   };
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch("http://localhost:8084/api/cours");
+        const data = await response.json();
+        console.log("API Response:", data);
+        setCourses(data);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   // Sorting logic
   const sortedCourses = [...courses].sort((a, b) => {
@@ -99,14 +58,17 @@ const CoursesComponent = () => {
   });
 
   // Filtering logic
-  const filteredCourses = sortedCourses.filter((course) => {
-    const matchesSearch =
-      course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.instructor.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "Tous" || course.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredCourses = sortedCourses.filter(
+    (course) =>
+      (course.titre &&
+        course.titre.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (course.description &&
+        course.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (course.module &&
+        course.module.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (course.niveau &&
+        course.niveau.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -118,39 +80,17 @@ const CoursesComponent = () => {
 
   // Column headers
   const columns = [
-    { key: "title", label: "Titre du Cours" },
-    { key: "category", label: "Catégorie" },
-    { key: "duration", label: "Durée" },
-    { key: "students", label: "Étudiants" },
-    { key: "difficulty", label: "Niveau" },
-    { key: "instructor", label: "Instructeur" },
-    { key: "status", label: "Statut" },
-    { key: "addedDate", label: "Date d'ajout" },
+    { key: "titre", label: "Titre du Cours" },
+    { key: "description", label: "Description" },
+    { key: "module", label: "Module" },
+    { key: "niveau", label: "Niveau" },
+    { key: "duree", label: "Durée (minutes)" },
+    { key: "liens", label: "Liens" },
+    { key: "Rating", label: "Rating" },
   ];
 
-  // FilterSelect Component
-  const FilterSelect = ({ options, selected, onSelect }) => (
-    <div className="relative group">
-      <button className="flex items-center px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg hover:border-purple-400 transition-colors">
-        {selected}
-        <ChevronDown className="ml-2 w-4 h-4" />
-      </button>
-      <div className="absolute hidden group-hover:block mt-1 w-full bg-gray-800 rounded-lg shadow-lg z-10">
-        {options.map((option) => (
-          <div
-            key={option}
-            onClick={() => onSelect(option)}
-            className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
-          >
-            {option}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
   // ActionMenu Component
-  const ActionMenu = ({ onEdit, onDelete }) => {
+  const ActionMenu = ({ onEdit, onDelete, onView, onDownload, courseId }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -162,15 +102,30 @@ const CoursesComponent = () => {
           <MoreVertical className="w-5 h-5 text-gray-400" />
         </button>
         {isOpen && (
-          <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+          <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 z-20">
             <button
-              onClick={onEdit}
+              onClick={() => {
+                onEdit();
+                setIsOpen(false);
+              }}
               className="flex items-center w-full px-4 py-2 hover:bg-gray-700"
             >
               <Edit className="w-4 h-4 mr-2" /> Modifier
             </button>
             <button
-              onClick={onDelete}
+              onClick={() => {
+                onDownload();
+                setIsOpen(false);
+              }}
+              className="flex items-center w-full px-4 py-2 hover:bg-gray-700"
+            >
+              <Download className="w-4 h-4 mr-2" /> Télécharger
+            </button>
+            <button
+              onClick={() => {
+                onDelete();
+                setIsOpen(false);
+              }}
               className="flex items-center w-full px-4 py-2 text-red-400 hover:bg-gray-700"
             >
               <Trash2 className="w-4 h-4 mr-2" /> Supprimer
@@ -188,31 +143,29 @@ const CoursesComponent = () => {
         <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
           Gestion des Cours
         </h2>
-        <button className="flex items-center px-4 py-2 bg-purple-600/20 text-purple-400 rounded-lg hover:bg-purple-600/30 transition-all">
+        <button
+          className="flex items-center px-4 py-2 bg-purple-600/20 text-purple-400 rounded-lg hover:bg-purple-600/30 transition-all"
+          onClick={() => setIsAddCourseModalOpen(true)} // Ajoutez cet onClick handler
+        >
           <PlusCircle className="w-5 h-5 mr-2" />
           Ajouter un Cours
+          <AjoutCours
+            isOpen={isAddCourseModalOpen}
+            onClose={() => setIsAddCourseModalOpen(false)}
+          />
         </button>
       </div>
 
-      {/* Controls Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Rechercher cours..."
-            className="w-full pl-10 pr-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-        </div>
-        <div className="flex gap-4">
-          <FilterSelect
-            options={["Tous", "Actif", "Inactif"]}
-            selected={statusFilter}
-            onSelect={setStatusFilter}
-          />
-        </div>
+      {/* Search Input */}
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="Rechercher cours..."
+          className="w-full pl-10 pr-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
       </div>
 
       {/* Data Table */}
@@ -254,32 +207,74 @@ const CoursesComponent = () => {
                 key={course.id}
                 className="hover:bg-gray-700/10 transition-colors"
               >
-                <td className="px-6 py-4">{course.title}</td>
-                <td className="px-6 py-4">{course.category}</td>
-                <td className="px-6 py-4">{course.duration}</td>
-                <td className="px-6 py-4">{course.students}</td>
-                <td className="px-6 py-4">{course.difficulty}</td>
-                <td className="px-6 py-4 text-gray-400">{course.instructor}</td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-2 py-1 rounded-full ${
-                      course.status === "Actif"
-                        ? "bg-green-500/20 text-green-300"
-                        : "bg-red-500/20 text-red-300"
-                    }`}
-                  >
-                    {course.status}
-                  </span>
+                <td className="px-6 py-4">{course.titre}</td>
+                <td className="px-6 py-4 text-gray-400">
+                  {course.description}
                 </td>
-                <td className="px-6 py-4">{course.addedDate}</td>
+                <td className="px-6 py-4">{course.module}</td>
+                <td className="px-6 py-4">{course.niveau}</td>
+                <td className="px-6 py-4">{course.duree}</td>
+                <td className="px-6 py-4">
+                  {course.liens ? (
+                    <a
+                      href={course.liens}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-purple-400 hover:underline"
+                    >
+                      Lien
+                    </a>
+                  ) : (
+                    "Aucun lien"
+                  )}
+                </td>
+                <td className="px-6 py-4">{course.ratingAvg}</td>
                 <td className="px-6 py-4 text-right">
                   <ActionMenu
-                    onEdit={() => console.log("Edit", course.id)}
-                    onDelete={() =>
-                      setCourses((prev) =>
-                        prev.filter((c) => c.id !== course.id)
-                      )
-                    }
+                    onEdit={() => {
+                      setSelectedCourseId(course.id);
+                      setIsEditCourseModalOpen(true);
+                    }}
+                    onDelete={() => {
+                      fetch(`http://localhost:8084/api/cours/${course.id}`, {
+                        method: "DELETE",
+                        credentials: "include",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        mode: "cors",
+                      })
+                        .then((response) => {
+                          if (response.ok) {
+                            setCourses((prev) =>
+                              prev.filter((c) => c.id !== course.id)
+                            );
+                          } else {
+                            // Get more detailed error information when possible
+                            return response.text().then((text) => {
+                              throw new Error(
+                                `Failed to delete: ${response.status} ${text}`
+                              );
+                            });
+                          }
+                        })
+                        .catch((error) => {
+                          console.error("Error deleting course:", error);
+                          // Consider showing an error message to the user instead of silently removing
+                          // setCourses(prev => prev.filter(c => c.id !== course.id));
+                        });
+                    }}
+                    onDownload={() => {
+                      // For download button, navigate to the same URL but trigger download
+                      const pdfUrl = `http://localhost:8084/api/cours/fichier/${course.fichierId}`;
+                      const a = document.createElement("a");
+                      a.href = pdfUrl;
+                      a.download = `${course.titre || "cours"}.pdf`;
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                    }}
+                    courseId={course.fichierId}
                   />
                 </td>
               </tr>
@@ -312,6 +307,18 @@ const CoursesComponent = () => {
           </button>
         </div>
       </div>
+      {/* Ajoutez ce composant AjoutCours à la fin du composant */}
+      <AjoutCours
+        isOpen={isAddCourseModalOpen}
+        onClose={() => setIsAddCourseModalOpen(false)}
+        onCourseAdded={refreshCourses}
+      />
+      <UpdateCours
+        isOpen={isEditCourseModalOpen}
+        onClose={() => setIsEditCourseModalOpen(false)}
+        coursId={selectedCourseId}
+        onCourseUpdated={refreshCourses}
+      />
     </div>
   );
 };

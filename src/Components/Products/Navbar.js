@@ -15,6 +15,7 @@ import logo from "./imgs/alien-svgrepo-com.svg"
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState(null);
+  const [hoveredMenuItem, setHoveredMenuItem] = useState(null);
 
   const menuItems = [
     {
@@ -88,11 +89,7 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-sm opacity-60"></div>
-              <img
-                src={logo}
-                alt="Logo"
-                className="h-12 w-12 relative z-10"
-              />
+              <img src={logo} alt="Logo" className="h-12 w-12 relative z-10" />
             </div>
             <div className="flex flex-col">
               <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
@@ -102,32 +99,29 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-1">
             {menuItems.map((item, index) => (
-              <div key={index} className="group relative">
+              <div
+                key={index}
+                className="relative z-10"
+                onMouseEnter={() => setHoveredMenuItem(index)}
+                onMouseLeave={() => setHoveredMenuItem(null)}
+              >
                 <a
                   href={item.link}
-                  className="flex items-center px-4 py-2 text-gray-300 hover:text-white transition-colors group-hover:bg-gray-800/50 rounded-lg"
-                  onClick={
-                    item.submenu
-                      ? (e) => {
-                          e.preventDefault();
-                          toggleSubmenu(index);
-                        }
-                      : undefined
-                  }
+                  className="flex items-center px-4 py-2 text-gray-300 hover:text-white transition-colors hover:bg-gray-800/50 rounded-lg"
+                  onClick={item.submenu ? (e) => e.preventDefault() : undefined}
                 >
                   <span className="mr-2 text-blue-400">{item.icon}</span>
                   <span>{item.title}</span>
                   {item.submenu && (
-                    <FiChevronDown className="ml-1 text-gray-400 group-hover:text-blue-400 transition-colors" />
+                    <FiChevronDown className="ml-1 text-gray-400 transition-colors" />
                   )}
                 </a>
 
-                {item.submenu && (
-                  <div className="absolute hidden group-hover:block bg-gray-800 border border-white/10 rounded-lg mt-1 py-2 w-56 shadow-lg shadow-purple-500/10 backdrop-blur-lg">
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-lg"></div>
+                {item.submenu && hoveredMenuItem === index && (
+                  <div className="absolute top-full left-0 bg-gray-800 border border-white/10 rounded-lg mt-1 py-2 w-56 shadow-lg shadow-purple-500/10 backdrop-blur-lg">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-lg" />
                     {item.submenu.map((subItem, subIndex) => (
                       <a
                         key={subIndex}
