@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   PlusCircle,
   Search,
@@ -7,42 +7,60 @@ import {
   Edit,
   Trash2,
 } from "lucide-react";
+import AddExamen from "./AddExamen";
+import UpdateExamen from "./UpdateExamen";
 
 const ExamenComponent = () => {
-  // Mock data with 12 examens
-  const [examens, setExamens] = useState([
-    {
-      id: 1,
-      title: "Examen Final IA",
-      subject: "Intelligence Artificielle",
-      date: "2024-06-15",
-      duration: "2h",
-      participants: 150,
-      status: "Actif",
-      type: "Final",
-    },
-    {
-      id: 2,
-      title: "Examen Partiel Math",
-      subject: "Mathématiques",
-      date: "2024-05-20",
-      duration: "1h30",
-      participants: 200,
-      status: "Inactif",
-      type: "Partiel",
-    },
-    // Add 10 more examens...
-  ]);
+  const [examens, setExamens] = useState([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedExamenId, setSelectedExamenId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // State management
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("Tous");
   const [sortConfig, setSortConfig] = useState({
-    key: "title",
+    key: "titre",
     direction: "asc",
   });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+
+  useEffect(() => {
+    const fetchExamens = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch("http://localhost:8084/api/examens");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setExamens(data);
+      } catch (err) {
+        console.error("Error fetching examens:", err);
+        setError(err.message);
+        setExamens([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchExamens();
+  }, []);
+
+  const refreshExamens = async () => {
+    try {
+      const response = await fetch("http://localhost:8084/api/examens");
+      const data = await response.json();
+      setExamens(data);
+      setError(null);
+    } catch (error) {
+      console.error("Refresh error:", error);
+      setError("Failed to refresh examens");
+    }
+  };
 
   // Sorting logic
   const sortedExamens = [...examens].sort((a, b) => {
@@ -53,14 +71,18 @@ const ExamenComponent = () => {
     return 0;
   });
 
-  // Filtering logic
+  // Filtering logic - Updated to match backend model properties
   const filteredExamens = sortedExamens.filter((examen) => {
+    // Check if properties exist before calling toLowerCase()
     const matchesSearch =
-      examen.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      examen.subject.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "Tous" || examen.status === statusFilter;
-    return matchesSearch && matchesStatus;
+      (examen.titre &&
+        examen.titre.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (examen.description &&
+        examen.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (examen.module &&
+        examen.module.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    return matchesSearch;
   });
 
   // Pagination logic
@@ -71,15 +93,14 @@ const ExamenComponent = () => {
     indexOfLastItem
   );
 
-  // Column headers
+  // Column headers - Updated to match backend model properties
   const columns = [
-    { key: "title", label: "Titre de l'Examen" },
-    { key: "subject", label: "Matière" },
+    { key: "titre", label: "Titre" },
+    { key: "description", label: "Description" },
+    { key: "niveau", label: "Niveau" },
+    { key: "module", label: "Module" },
+    { key: "ratingAvg", label: "Rating" },
     { key: "date", label: "Date" },
-    { key: "duration", label: "Durée" },
-    { key: "participants", label: "Participants" },
-    { key: "type", label: "Type" },
-    { key: "status", label: "Statut" },
   ];
 
   // FilterSelect Component
@@ -118,13 +139,19 @@ const ExamenComponent = () => {
         {isOpen && (
           <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
             <button
-              onClick={onEdit}
+              onClick={() => {
+                onEdit();
+                setIsOpen(false);
+              }}
               className="flex items-center w-full px-4 py-2 hover:bg-gray-700"
             >
               <Edit className="w-4 h-4 mr-2" /> Modifier
             </button>
             <button
-              onClick={onDelete}
+              onClick={() => {
+                onDelete();
+                setIsOpen(false);
+              }}
               className="flex items-center w-full px-4 py-2 text-red-400 hover:bg-gray-700"
             >
               <Trash2 className="w-4 h-4 mr-2" /> Supprimer
@@ -135,6 +162,38 @@ const ExamenComponent = () => {
     );
   };
 
+  // Loading and error states
+  if (isLoading) {
+    return (
+      <div className="flex justify-center p-8">Chargement en cours...</div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center p-8 text-red-500">
+        <p>Erreur: {error}</p>
+        <button
+          onClick={refreshExamens}
+          className="mt-4 px-4 py-2 bg-purple-600 text-white rounded"
+        >
+          Réessayer
+        </button>
+      </div>
+    );
+  }
+
+  // Function to format date
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("fr-FR");
+    } catch (e) {
+      return dateString;
+    }
+  };
+
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Header Section */}
@@ -142,7 +201,10 @@ const ExamenComponent = () => {
         <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
           Gestion des Examens
         </h2>
-        <button className="flex items-center px-4 py-2 bg-purple-600/20 text-purple-400 rounded-lg hover:bg-purple-600/30 transition-all">
+        <button
+          className="flex items-center px-4 py-2 bg-purple-600/20 text-purple-400 rounded-lg hover:bg-purple-600/30 transition-all"
+          onClick={() => setIsAddModalOpen(true)}
+        >
           <PlusCircle className="w-5 h-5 mr-2" />
           Ajouter un Examen
         </button>
@@ -162,7 +224,7 @@ const ExamenComponent = () => {
         </div>
         <div className="flex gap-4">
           <FilterSelect
-            options={["Tous", "Actif", "Inactif"]}
+            options={["Tous", "Gi1", "Gi2", "Gi3"]}
             selected={statusFilter}
             onSelect={setStatusFilter}
           />
@@ -171,74 +233,84 @@ const ExamenComponent = () => {
 
       {/* Data Table */}
       <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl border border-white/10 overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-800/50">
-            <tr>
-              {columns.map((column) => (
-                <th
-                  key={column.key}
-                  className="px-6 py-4 text-left cursor-pointer hover:bg-gray-700/20 transition-colors"
-                  onClick={() =>
-                    setSortConfig({
-                      key: column.key,
-                      direction:
-                        sortConfig.key === column.key &&
-                        sortConfig.direction === "asc"
-                          ? "desc"
-                          : "asc",
-                    })
-                  }
-                >
-                  <div className="flex items-center">
-                    {column.label}
-                    {sortConfig.key === column.key && (
-                      <span className="ml-2">
-                        {sortConfig.direction === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
-                  </div>
-                </th>
-              ))}
-              <th className="px-6 py-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-700">
-            {currentExamens.map((examen) => (
-              <tr
-                key={examen.id}
-                className="hover:bg-gray-700/10 transition-colors"
-              >
-                <td className="px-6 py-4">{examen.title}</td>
-                <td className="px-6 py-4">{examen.subject}</td>
-                <td className="px-6 py-4">{examen.date}</td>
-                <td className="px-6 py-4">{examen.duration}</td>
-                <td className="px-6 py-4">{examen.participants}</td>
-                <td className="px-6 py-4">{examen.type}</td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-2 py-1 rounded-full ${
-                      examen.status === "Actif"
-                        ? "bg-green-500/20 text-green-300"
-                        : "bg-red-500/20 text-red-300"
-                    }`}
-                  >
-                    {examen.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <ActionMenu
-                    onEdit={() => console.log("Edit", examen.id)}
-                    onDelete={() =>
-                      setExamens((prev) =>
-                        prev.filter((e) => e.id !== examen.id)
-                      )
+        {examens.length === 0 ? (
+          <div className="p-8 text-center text-gray-400">
+            Aucun examen trouvé
+          </div>
+        ) : (
+          <table className="w-full">
+            <thead className="bg-gray-800/50">
+              <tr>
+                {columns.map((column) => (
+                  <th
+                    key={column.key}
+                    className="px-6 py-4 text-left cursor-pointer hover:bg-gray-700/20 transition-colors"
+                    onClick={() =>
+                      setSortConfig({
+                        key: column.key,
+                        direction:
+                          sortConfig.key === column.key &&
+                          sortConfig.direction === "asc"
+                            ? "desc"
+                            : "asc",
+                      })
                     }
-                  />
-                </td>
+                  >
+                    <div className="flex items-center">
+                      {column.label}
+                      {sortConfig.key === column.key && (
+                        <span className="ml-2">
+                          {sortConfig.direction === "asc" ? "↑" : "↓"}
+                        </span>
+                      )}
+                    </div>
+                  </th>
+                ))}
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-700">
+              {currentExamens.map((examen) => (
+                <tr
+                  key={examen.id}
+                  className="hover:bg-gray-700/10 transition-colors"
+                >
+                  <td className="px-6 py-4">{examen.titre || "-"}</td>
+                  <td className="px-6 py-4">{examen.description || "-"}</td>
+                  <td className="px-6 py-4">{examen.niveau || "-"}</td>
+                  <td className="px-6 py-4">{examen.module || "-"}</td>
+                  <td className="px-6 py-4">{examen.ratingAvg || "-"}</td>
+                  <td className="px-6 py-4">{formatDate(examen.date)}</td>
+                  <td className="px-6 py-4 text-right">
+                    <ActionMenu
+                      onEdit={() => {
+                        setSelectedExamenId(examen.id);
+                        setIsEditModalOpen(true);
+                      }}
+                      onDelete={async () => {
+                        try {
+                          const response = await fetch(
+                            `http://localhost:8084/api/examens/${examen.id}`,
+                            { method: "DELETE" }
+                          );
+                          if (!response.ok) {
+                            throw new Error(
+                              `HTTP error! status: ${response.status}`
+                            );
+                          }
+                          refreshExamens();
+                        } catch (err) {
+                          console.error("Error deleting examen:", err);
+                          setError(`Failed to delete examen: ${err.message}`);
+                        }
+                      }}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Pagination */}
@@ -265,6 +337,21 @@ const ExamenComponent = () => {
           </button>
         </div>
       </div>
+      <AddExamen
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onExamenAdded={refreshExamens}
+      />
+
+      <UpdateExamen
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedExamenId(null);
+        }}
+        examenId={selectedExamenId}
+        onExamenUpdated={refreshExamens}
+      />
     </div>
   );
 };

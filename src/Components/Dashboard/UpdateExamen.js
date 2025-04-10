@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { X, Upload, Download } from "lucide-react";
 
-const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
+const UpdateExamen = ({ isOpen, onClose, examenId, onExamenUpdated }) => {
   const [formData, setFormData] = useState({
     titre: "",
     description: "",
-    module: "",
     niveau: "",
-    ratingAvg: 0,
+    module: "",
     date: "",
+    ratingAvg: 0,
   });
   const [file, setFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -17,25 +17,26 @@ const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
   const [existingFileId, setExistingFileId] = useState(null);
 
   useEffect(() => {
-    if (isOpen && exerciseId) {
-      fetchExercise();
+    if (isOpen && examenId) {
+      fetchExamen();
     }
-  }, [isOpen, exerciseId]);
+  }, [isOpen, examenId]);
 
-  const fetchExercise = async () => {
+  const fetchExamen = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8084/api/exercices/${exerciseId}`
+        `http://localhost:8084/api/examens/${examenId}`
       );
       const data = await response.json();
 
+      // Update to match the backend model attributes
       setFormData({
-        titre: data.titre,
-        description: data.description,
-        module: data.module,
-        niveau: data.niveau,
-        ratingAvg: data.ratingAvg,
+        titre: data.titre || "",
+        description: data.description || "",
+        niveau: data.niveau || "",
+        module: data.module || "",
         date: data.date ? new Date(data.date).toISOString().slice(0, 16) : "",
+        ratingAvg: data.ratingAvg || 0,
       });
 
       if (data.fichierId) {
@@ -43,7 +44,7 @@ const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
         setExistingFileId(data.fichierId);
       }
     } catch (error) {
-      console.error("Error fetching exercise:", error);
+      console.error("Error fetching examen:", error);
     }
   };
 
@@ -63,10 +64,10 @@ const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
 
   const handleDownload = () => {
     if (existingFileId) {
-      const pdfUrl = `http://localhost:8084/api/exercices/fichier/${existingFileId}`;
+      const pdfUrl = `http://localhost:8084/api/examens/fichier/${existingFileId}`;
       const a = document.createElement("a");
       a.href = pdfUrl;
-      a.download = `${formData.titre || "exercice"}.pdf`;
+      a.download = `${formData.titre || "examen"}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -88,7 +89,7 @@ const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8084/api/exercices/update/${exerciseId}`,
+        `http://localhost:8084/api/examens/update/${examenId}`,
         {
           method: "PUT",
           body: formDataToSend,
@@ -96,11 +97,11 @@ const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
       );
 
       if (response.ok) {
-        onExerciseUpdated();
+        onExamenUpdated();
         onClose();
       }
     } catch (error) {
-      console.error("Error updating exercise:", error);
+      console.error("Error updating examen:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -109,11 +110,11 @@ const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
       <div className="bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl border border-gray-700">
         <div className="flex justify-between items-center border-b border-gray-700 p-4">
           <h2 className="text-xl font-semibold text-white">
-            Modifier l'Exercice
+            Modifier l'Examen
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white">
             <X size={24} />
@@ -159,25 +160,11 @@ const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
                 className="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-1 focus:ring-purple-400 focus:border-purple-400"
                 required
               >
+                <option value="">Sélectionner un niveau</option>
                 <option value="Gi1">Gi1</option>
                 <option value="Gi2">Gi2</option>
                 <option value="Gi3">Gi3</option>
               </select>
-            </div>
-
-            <div>
-              <label className="block mb-2 text-sm font-medium text-gray-300">
-                Rating
-              </label>
-              <input
-                type="number"
-                name="ratingAvg"
-                value={formData.ratingAvg}
-                onChange={handleChange}
-                className="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-1 focus:ring-purple-400 focus:border-purple-400"
-                min="0"
-                max="5"
-              />
             </div>
 
             <div>
@@ -191,6 +178,21 @@ const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
                 onChange={handleChange}
                 className="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-1 focus:ring-purple-400 focus:border-purple-400"
                 required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2 text-sm font-medium text-gray-300">
+                Note moyenne
+              </label>
+              <input
+                type="number"
+                name="ratingAvg"
+                value={formData.ratingAvg}
+                onChange={handleChange}
+                className="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-1 focus:ring-purple-400 focus:border-purple-400"
+                min="0"
+                max="20"
               />
             </div>
 
@@ -286,4 +288,4 @@ const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
   );
 };
 
-export default UpdateExercise;
+export default UpdateExamen;

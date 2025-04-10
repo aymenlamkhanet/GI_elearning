@@ -41,21 +41,7 @@ const ExerciseComponent = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        // Ensure data is an array and has the expected structure
-        const formattedData = Array.isArray(data)
-          ? data.map((ex) => ({
-              id: ex.id || ex._id,
-              titre: ex.titre || "",
-              description: ex.description || "",
-              fichierId: ex.fichierId || null,
-              niveau: ex.niveau || "Gi1",
-              module: ex.module || "",
-              ratingAvg: ex.ratingAvg || 0,
-              date: ex.date || new Date().toISOString(),
-              status: ex.status || "Actif",
-            }))
-          : [];
-        setExercises(formattedData);
+        setExercises(data);
       } catch (err) {
         console.error("Error fetching exercises:", err);
         setError(err.message);
@@ -103,14 +89,14 @@ const ExerciseComponent = () => {
     indexOfLastItem
   );
 
-  // Column configuration
+  // Column configuration - removed status column
   const columns = [
     { key: "titre", label: "Titre de l'Exercice" },
+    { key: "description", label: "Description" },
     { key: "module", label: "Module" },
     { key: "niveau", label: "Niveau" },
     { key: "ratingAvg", label: "Rating" },
     { key: "date", label: "Date" },
-    { key: "status", label: "Statut" },
   ];
 
   // Action handlers
@@ -137,22 +123,39 @@ const ExerciseComponent = () => {
     }
   };
 
-  const handleDownload = (exercise) => {
-    if (!exercise.fichierId) return;
+  const handleDownload = async (exercise) => {
+    try {
+      if (!exercise.fichierId) {
+        throw new Error("No file associated with this exercise");
+      }
 
-    const link = document.createElement("a");
-    link.href = `http://localhost:8084/api/exercices/fichier/${exercise.fichierId}`;
-    link.download = `${exercise.titre || "exercise"}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      const response = await fetch(
+        `http://localhost:8084/api/exercices/fichier/${exercise.fichierId}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to download file");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${exercise.titre || "exercise"}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Download error:", error);
+      setError("Failed to download file");
+    }
   };
 
   const refreshExercises = async () => {
     try {
       const response = await fetch("http://localhost:8084/api/exercices");
       const data = await response.json();
-      setExercises(Array.isArray(data) ? data : []);
+      setExercises(data);
       setError(null);
     } catch (error) {
       console.error("Refresh error:", error);
@@ -274,30 +277,26 @@ const ExerciseComponent = () => {
                   key={exercise.id}
                   className="hover:bg-gray-700/10 transition-colors"
                 >
-                  <td className="px-6 py-4">{exercise.titre}</td>
-                  <td className="px-6 py-4">{exercise.module}</td>
-                  <td className="px-6 py-4">{exercise.niveau}</td>
-                  <td className="px-6 py-4">{exercise.ratingAvg}</td>
+                  <td className="px-6 py-4">{exercise.titre || "-"}</td>
+                  <td className="px-6 py-4">{exercise.description || "-"}</td>
+                  <td className="px-6 py-4">{exercise.module || "-"}</td>
+                  <td className="px-6 py-4">{exercise.niveau || "-"}</td>
+                  <td className="px-6 py-4">{exercise.ratingAvg || "-"}</td>
                   <td className="px-6 py-4">
-                    {new Date(exercise.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-2 py-1 rounded-full ${
-                        exercise.status === "Actif"
-                          ? "bg-green-500/20 text-green-300"
-                          : "bg-red-500/20 text-red-300"
-                      }`}
-                    >
-                      {exercise.status}
-                    </span>
+                    {exercise.date
+                      ? new Date(exercise.date).toLocaleDateString()
+                      : "-"}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="relative">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSelectedExerciseId(exercise.id);
+                          setSelectedExerciseId(
+                            selectedExerciseId === exercise.id
+                              ? null
+                              : exercise.id
+                          );
                         }}
                         className="p-1 hover:bg-gray-700 rounded"
                       >

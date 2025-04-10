@@ -16,6 +16,7 @@ import DoubleDiplomation from "./Components/Conseils/DoubleDiplomation";
 import ExchangePage from "./Components/Conseils/ExchangePage";
 import AdminDashboard from "./Components/Dashboard/AdminDashboard";
 import ProfDashboard from "./Components/Privatespace/Prof/ProfDashboard";
+import QuestionsForum from "./Components/Discussion/QuestionsForum";
 
 const App = () => {
   return (
@@ -25,6 +26,7 @@ const App = () => {
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
 
         <Route path="/ProfDashboard" element={<ProfDashboard />} />
+        <Route path="/Forum" element={< QuestionsForum/>} />
         <Route path="/algos" element={<AlgorithmsPage />} />
         <Route path="/ExchangePage" element={<ExchangePage />} />
         <Route path="/DoubleDiplomation" element={<DoubleDiplomation />} />
