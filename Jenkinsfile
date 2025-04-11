@@ -46,13 +46,16 @@ pipeline {
         stage('Build Docker Image') {
             agent {
                 docker {
-                    image 'docker:stable-dind'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock --privileged --group-add $(stat -c %g /var/run/docker.sock)'
+                    image 'docker:24.0-dind'  # Official dind image
+                    args '''
+                        -v /var/run/docker.sock:/var/run/docker.sock
+                        --privileged
+                        --group-add $(stat -c %g /var/run/docker.sock)
+                    '''
                 }
             }
             steps {
                 script {
-                    echo 'Building Docker image...'
                     docker.build("${DOCKER_IMAGE}")
                 }
             }
