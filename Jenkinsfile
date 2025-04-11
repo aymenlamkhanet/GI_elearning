@@ -4,6 +4,7 @@ pipeline {
     environment {
         NODE_VERSION = '20.15.0'              // Node.js version
         DOCKER_IMAGE = "my-app:${env.BUILD_ID}" // Docker image name with unique build ID
+        DOCKER_HOST = 'tcp://docker:2376'
     }
 
     tools {
