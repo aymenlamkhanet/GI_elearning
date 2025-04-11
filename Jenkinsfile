@@ -46,8 +46,8 @@ pipeline {
         stage('Build Docker Image') {
             agent {
                 docker {
-                    image 'docker:stable'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                    image 'docker:stable-dind'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock --privileged --group-add $(stat -c %g /var/run/docker.sock)'
                 }
             }
             steps {
