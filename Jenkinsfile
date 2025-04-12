@@ -34,14 +34,11 @@ pipeline {
             agent {
                 docker {
                     image 'docker:latest'
-                    // For Windows:
-                    args '-e DOCKER_HOST=tcp://host.docker.internal:2375'
-                    // For Linux:
-                    // args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.docker:/root/.docker'
+                    args '--dns 8.8.8.8 --dns 8.8.4.4 -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_BUILDKIT=0'
                 }
             }
             environment {
-                DOCKER_CONFIG = "$HOME/.docker"  // Custom Docker config path
+                DOCKER_CONFIG = "$HOME/.docker"
             }
             steps {
                 echo 'Building Docker Image...'
