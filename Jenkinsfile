@@ -33,17 +33,16 @@ pipeline {
         stage('Build Docker Image') {
             agent {
                 docker {
-                    image 'docker:24.0-dind'  // Official Docker-in-Docker image
-                    args '--privileged'        // Required for DinD
+                    image 'docker:latest'
+                    args '--privileged'
                 }
             }
             environment {
-                DOCKER_TLS_CERTDIR = ""  // Disable TLS for simplicity
-                DOCKER_HOST = "tcp://docker:2375"  // Connect to the DinD service
+                DOCKER_HOST = 'tcp://host.docker.internal:2375'
             }
             steps {
-                sh 'docker version'  // Verify Docker is available
-                sh "docker build -t ${DOCKER_IMAGE} ."  // Build the image
+                sh 'docker version'
+                sh "docker build -t ${DOCKER_IMAGE} ."
             }
         }
     }
