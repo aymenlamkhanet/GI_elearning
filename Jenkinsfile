@@ -1,11 +1,11 @@
 pipeline {
     agent any
     environment {
-        NODE_VERSION = 'v23.7.0'
+        NODE_VERSION = 'v23.7.0'  // Optional, but ensure it's consistent if used elsewhere
         DOCKER_IMAGE = "my-app:${env.BUILD_ID}"
     }
     tools {
-        nodejs 'NodeJs20.15.0' 
+        nodejs 'NodeJS 23.7.0' // Corrected tool name to match Jenkins configuration
     }
     stages {
         stage('Clone Repository') {
@@ -31,7 +31,6 @@ pipeline {
         }
         
         stage('Build Docker Image') {
-            
             environment {
                 DOCKER_HOST = 'tcp://host.docker.internal:2375'
             }
