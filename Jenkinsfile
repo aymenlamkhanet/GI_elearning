@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        NODE_VERSION = '20.15.0'
+        NODE_VERSION = 'v23.7.0'
         DOCKER_IMAGE = "my-app:${env.BUILD_ID}"
     }
     tools {
