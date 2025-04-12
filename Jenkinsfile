@@ -31,20 +31,20 @@ pipeline {
         }
         
         stage('Build Docker Image') {
-            agent {
-                docker {
-                    image 'docker:latest'
-                    args '--dns 8.8.8.8 --dns 8.8.4.4 -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_BUILDKIT=0'
-                }
-            }
-            environment {
-                DOCKER_CONFIG = "$HOME/.docker"
-            }
-            steps {
-                echo 'Building Docker Image...'
-                sh "docker build -t ${DOCKER_IMAGE} ."
-            }
+    agent {
+        docker {
+            image 'docker:latest'
+            args '-e DOCKER_HOST=tcp://host.docker.internal:2375'  // Use TCP instead of socket
         }
+    }
+    environment {
+        DOCKER_CONFIG = "$HOME/.docker"  // Still needed for config files
+    }
+    steps {
+        echo 'Building Docker Image...'
+        sh "docker build -t ${DOCKER_IMAGE} ."
+    }
+}
     }
     
     post {
