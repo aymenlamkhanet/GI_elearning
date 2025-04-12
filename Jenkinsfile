@@ -31,12 +31,14 @@ pipeline {
         }
         
         stage('Build Docker Image') {
-            environment {
-                DOCKER_HOST = 'tcp://host.docker.internal:2375'
+            agent {
+                docker {
+                    image 'docker:latest' // Uses an official Docker image
+                    args '-v /var/run/docker.sock:/var/run/docker.sock' // Mounts the host's Docker socket
+                }
             }
             steps {
-                echo 'Build Docker Image ......'
-                sh 'docker version'
+                echo 'Building Docker Image...'
                 sh "docker build -t ${DOCKER_IMAGE} ."
             }
         }
