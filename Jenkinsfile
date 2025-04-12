@@ -31,19 +31,22 @@ pipeline {
         }
         
         stage('Build Docker Image') {
-          agent {
-            docker {
-              image 'docker:latest'
-              args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.docker:/root/.docker'
+            agent {
+                docker {
+                    image 'docker:latest'
+                    // For Windows:
+                    args '-e DOCKER_HOST=tcp://host.docker.internal:2375'
+                    // For Linux:
+                    // args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.docker:/root/.docker'
+                }
             }
-          }
-          environment {
-            DOCKER_CONFIG = "$HOME/.docker"  // Use a writable directory
-          }
-          steps {
-            echo 'Building Docker Image...'
-            sh "docker build -t ${DOCKER_IMAGE} ."
-          }
+            environment {
+                DOCKER_CONFIG = "$HOME/.docker"  // Custom Docker config path
+            }
+            steps {
+                echo 'Building Docker Image...'
+                sh "docker build -t ${DOCKER_IMAGE} ."
+            }
         }
     }
     
