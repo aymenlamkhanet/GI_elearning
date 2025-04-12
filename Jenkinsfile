@@ -31,12 +31,7 @@ pipeline {
         }
         
         stage('Build Docker Image') {
-            agent {
-                docker {
-                    image 'docker:latest'
-                    args '--privileged'
-                }
-            }
+            
             environment {
                 DOCKER_HOST = 'tcp://host.docker.internal:2375'
             }
