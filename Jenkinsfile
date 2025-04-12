@@ -17,7 +17,7 @@ pipeline {
         
         stage('Install Dependencies') {
             steps {
-                echo 'Installing dependencies...'
+                echo 'Installing dependencies......'
                 sh 'npm --version'
                 sh 'npm install'
             }
@@ -36,6 +36,7 @@ pipeline {
                 DOCKER_HOST = 'tcp://host.docker.internal:2375'
             }
             steps {
+                echo 'Build Docker Image ......'
                 sh 'docker version'
                 sh "docker build -t ${DOCKER_IMAGE} ."
             }
