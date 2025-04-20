@@ -1,64 +1,52 @@
 pipeline {
     agent any
-
     environment {
-        NODE_VERSION = '20.15.0'              // Node.js version
-        DOCKER_IMAGE = "my-app:${env.BUILD_ID}" // Docker image name with unique build ID
+        NODE_VERSION = 'v23.7.0'  // Optional, but ensure it's consistent if used elsewhere
+        DOCKER_IMAGE = "my-app:${env.BUILD_ID}"
     }
-
     tools {
-        nodejs 'NodeJs20.15.0' 
+        nodejs 'NodeJS 23.7.0' // Corrected tool name to match Jenkins configuration
     }
-
     stages {
-        // Stage 1: Clone Repository
         stage('Clone Repository') {
             steps {
-                script {
-                    echo 'Cloning the repository...'
-                    git branch: 'main', url: 'https://github.com/aymenlamkhanet/GI_elearning.git'
-                }
+                echo 'Cloning the repository...'
+                git branch: 'main', url: 'https://github.com/aymenlamkhanet/GI_elearning.git'
             }
         }
-
-        // Stage 2: Install Dependencies
+        
         stage('Install Dependencies') {
             steps {
-                script {
-                    echo 'Installing dependencies...'
-                    sh 'npm --version'
-                    sh 'npm install'
-                }
+                echo 'Installing dependencies......'
+                sh 'npm --version'
+                sh 'npm install'
             }
         }
-
-        // Stage 3: Run Tests
+        
         stage('Run Tests') {
             steps {
-                script {
-                    echo 'Running tests...'
-                    sh 'npm test'
-                }
+                echo 'Running tests...'
+                sh 'npm test'
             }
         }
-
-        // Stage 4: Build Docker Image
+        
         stage('Build Docker Image') {
-            agent {
-                docker {
-                    image 'docker:stable'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
-                }
-            }
-            steps {
-                script {
-                    echo 'Building Docker image...'
-                    docker.build("${DOCKER_IMAGE}")
-                }
-            }
+    agent {
+        docker {
+            image 'docker:latest'
+            args '-e DOCKER_HOST=tcp://host.docker.internal:2375'  // Use TCP instead of socket
         }
     }
-
+    environment {
+        DOCKER_CONFIG = "$HOME/.docker"  // Still needed for config files
+    }
+    steps {
+        echo 'Building Docker Image...'
+        sh "docker build -t ${DOCKER_IMAGE} ."
+    }
+}
+    }
+    
     post {
         success {
             echo 'Pipeline succeeded! 🎉'
