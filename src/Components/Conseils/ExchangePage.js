@@ -21,142 +21,96 @@ import FooterSection from "../LandingPage/FooterSection";
 const exchangePrograms = [
   {
     id: 1,
-    university: "Université Paris-Saclay",
+    university: "INSA Centre Val De Loire",
     country: "France",
-    city: "Paris",
+    city: "Blois",
     image: "/api/placeholder/800/500",
     flag: "🇫🇷",
-    programs: ["Computer Science", "Data Science", "Networks"],
-    duration: "1 semester",
-    languages: ["French (B2)", "English (B2)"],
+    programs: ["Double Diplomation", "Échange", "PFE"],
+    duration: "1-2 semesters",
+    languages: ["French (B2)", "English (B1)"],
     accommodationAvailable: true,
     deadline: "November 15th",
     scholarshipAvailable: true,
-    rating: 4.8,
-    reviews: 124,
-    description: "Experience a semester in one of France's most prestigious technical universities. The program focuses on advanced computer science and engineering disciplines with state-of-the-art facilities.",
+    rating: 4.7,
+    reviews: 92,
+    description:
+      "INSA Centre Val De Loire offers comprehensive exchange opportunities including double degree programs, semester exchanges, and final year projects (PFE). The institute is known for its engineering excellence and strong industry connections.",
     featured: true,
   },
   {
-    id: 2, 
-    university: "Polytechnic University of Catalonia",
-    country: "Spain",
-    city: "Barcelona",
+    id: 2,
+    university: "POLYTECH Angers",
+    country: "France",
+    city: "Angers",
     image: "/api/placeholder/800/500",
-    flag: "🇪🇸",
-    programs: ["Computer Engineering", "Cybersecurity", "AI"],
+    flag: "🇫🇷",
+    programs: ["PFE", "Semester Study"],
     duration: "1-2 semesters",
-    languages: ["Spanish (B1)", "English (B2)"],
+    languages: ["French (B2)", "English (B1)"],
     accommodationAvailable: true,
     deadline: "December 1st",
     scholarshipAvailable: true,
-    rating: 4.7,
-    reviews: 98,
-    description: "Study in vibrant Barcelona at one of Spain's top technical universities. The program offers a wide range of engineering courses with a focus on innovation and practical applications.",
+    rating: 4.6,
+    reviews: 84,
+    description:
+      "POLYTECH Angers provides opportunities for final year projects (PFE) and semester-based academic studies. Located in the beautiful Loire Valley, the school offers programs with a focus on practical engineering applications.",
     featured: true,
   },
   {
     id: 3,
-    university: "University of Toronto",
-    country: "Canada",
-    city: "Toronto",
+    university: "INSA DE Toulouse",
+    country: "France",
+    city: "Toulouse",
     image: "/api/placeholder/800/500",
-    flag: "🇨🇦",
-    programs: ["Software Engineering", "Machine Learning", "HCI"],
-    duration: "1-2 semesters",
-    languages: ["English (IELTS 6.5+)"],
+    flag: "🇫🇷",
+    programs: ["Exchange Program"],
+    duration: "1 semester",
+    languages: ["French (B2)", "English (B1)"],
     accommodationAvailable: true,
-    deadline: "January 15th",
+    deadline: "November 30th",
     scholarshipAvailable: true,
-    rating: 4.9,
-    reviews: 156,
-    description: "Join one of Canada's leading universities in the heart of multicultural Toronto. The program offers cutting-edge research opportunities and a diverse academic environment.",
+    rating: 4.8,
+    reviews: 116,
+    description:
+      "INSA DE Toulouse offers exchange programs in one of France's most vibrant technology hubs. Known for aerospace engineering and advanced technologies, the school provides a stimulating academic environment with strong research facilities.",
     featured: true,
   },
   {
     id: 4,
-    university: "INSA Lyon",
+    university: "EIL Côte d'Opale",
     country: "France",
-    city: "Lyon",
+    city: "Calais",
     image: "/api/placeholder/800/500",
     flag: "🇫🇷",
-    programs: ["Computer Science", "Information Systems", "Telecommunications"],
-    duration: "1 semester",
-    languages: ["French (B1)", "English (B2)"],
+    programs: ["Double Diplomation", "Exchange", "Semester Study"],
+    duration: "1-2 semesters",
+    languages: ["French (B1)", "English (B1)"],
     accommodationAvailable: true,
-    deadline: "October 30th",
+    deadline: "December 15th",
     scholarshipAvailable: false,
     rating: 4.5,
-    reviews: 87,
-    description: "Study in Lyon's premier engineering school with a strong focus on practical applications and industry connections. The program includes opportunities for internships with partner companies.",
+    reviews: 78,
+    description:
+      "EIL Côte d'Opale offers multiple pathways including double degree programs, exchange opportunities, and semester-based studies. Located near the coast in northern France, the school specializes in engineering and computer science disciplines.",
   },
   {
     id: 5,
-    university: "Technical University of Madrid",
-    country: "Spain",
-    city: "Madrid",
-    image: "/api/placeholder/800/500",
-    flag: "🇪🇸",
-    programs: ["Software Engineering", "Computer Networks", "Digital Systems"],
-    duration: "1 semester",
-    languages: ["Spanish (B1)", "English (B1)"],
-    accommodationAvailable: true,
-    deadline: "November 30th",
-    scholarshipAvailable: true,
-    rating: 4.6,
-    reviews: 92,
-    description: "Experience Madrid's vibrant culture while studying at Spain's oldest and most prestigious technical university. The program emphasizes both theoretical foundation and practical engineering skills.",
-  },
-  {
-    id: 6,
-    university: "University of Montreal",
+    university: "Université du Québec à Chicoutimi",
     country: "Canada",
-    city: "Montreal",
+    city: "Chicoutimi",
     image: "/api/placeholder/800/500",
     flag: "🇨🇦",
-    programs: ["Computer Science", "AI & Machine Learning", "Software Design"],
+    programs: ["Exchange Program"],
     duration: "1-2 semesters",
-    languages: ["English (B2)", "French (B1)"],
+    languages: ["French (B2)", "English (B1)"],
     accommodationAvailable: true,
-    deadline: "December 15th",
+    deadline: "January 15th",
     scholarshipAvailable: true,
     rating: 4.7,
-    reviews: 113,
-    description: "Study in bilingual Montreal at one of Canada's leading research universities. The program offers innovative courses and research opportunities in computer science and AI.",
-  },
-  {
-    id: 7,
-    university: "IMT Atlantique",
-    country: "France",
-    city: "Brest",
-    image: "/api/placeholder/800/500",
-    flag: "🇫🇷",
-    programs: ["Computer Networks", "IoT", "Cybersecurity"],
-    duration: "1 semester",
-    languages: ["French (B1)", "English (B2)"],
-    accommodationAvailable: true,
-    deadline: "November 1st",
-    scholarshipAvailable: true,
-    rating: 4.4,
-    reviews: 76,
-    description: "Join one of France's elite engineering schools with a strong focus on digital technology and communications. The program includes hands-on projects and industry collaborations.",
-  },
-  {
-    id: 8,
-    university: "University of Valencia",
-    country: "Spain",
-    city: "Valencia",
-    image: "/api/placeholder/800/500",
-    flag: "🇪🇸",
-    programs: ["Computer Engineering", "Mobile Applications", "Web Technologies"],
-    duration: "1 semester",
-    languages: ["Spanish (B1)", "English (B1)"],
-    accommodationAvailable: true,
-    deadline: "December 10th",
-    scholarshipAvailable: false,
-    rating: 4.3,
-    reviews: 68,
-    description: "Study in the beautiful coastal city of Valencia and enjoy its rich culture while learning at one of Spain's historic universities. The program offers a blend of traditional and modern computing curricula.",
+    reviews: 103,
+    description:
+      "The Université du Québec à Chicoutimi offers exchange opportunities in a bilingual Canadian setting. The university is known for its strong programs in engineering, computer science, and environmental studies, with a focus on sustainable development.",
   },
 ];
 
@@ -190,29 +144,29 @@ const ExchangePage = () => {
   const testimonials = [
     {
       id: 1,
-      name: "Sofia Garcia",
+      name: "Thomas Laurent",
       image: "/api/placeholder/100/100",
-      university: "Polytechnic University of Catalonia",
-      country: "Spain",
-      text: "My exchange semester in Barcelona was transformative. The courses were challenging but incredibly rewarding, and the cultural experience was beyond anything I expected.",
+      university: "INSA Centre Val De Loire",
+      country: "France",
+      text: "My double diplomation at INSA was a transformative experience. The curriculum was challenging but incredibly rewarding, and I gained invaluable international experience for my engineering career.",
       year: "2024",
     },
     {
       id: 2,
-      name: "Ahmed Benali",
+      name: "Sophie Martin",
       image: "/api/placeholder/100/100",
-      university: "Université Paris-Saclay",
+      university: "POLYTECH Angers",
       country: "France",
-      text: "Studying in Paris opened doors I never knew existed. The academic environment was stimulating, and I've made connections that will last a lifetime.",
+      text: "Completing my PFE at POLYTECH Angers opened doors to industry connections I never imagined. The faculty support was outstanding, and I developed practical skills that immediately translated to my job.",
       year: "2023",
     },
     {
       id: 3,
-      name: "Priya Shah",
+      name: "Marc Tremblay",
       image: "/api/placeholder/100/100",
-      university: "University of Toronto",
+      university: "Université du Québec à Chicoutimi",
       country: "Canada",
-      text: "Toronto provided the perfect blend of academic excellence and cultural diversity. The research opportunities were exceptional, and the city itself was a classroom.",
+      text: "The exchange program at UQAC provided the perfect blend of academic excellence and cultural immersion. Living and studying in Quebec improved my French while gaining world-class engineering education.",
       year: "2024",
     },
   ];
@@ -237,22 +191,22 @@ const ExchangePage = () => {
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                Discover the World
+                Étudier à l'International
               </span>
               <br />
-              <span>While You Study</span>
+              <span>Double Diplômes et Échanges</span>
             </h1>
             <p className="text-xl text-gray-300 mb-8">
-              Expand your horizons with our international exchange programs.
-              Study at prestigious universities while immersing yourself in new
-              cultures.
+              Élargissez vos horizons avec nos programmes d'échange
+              internationaux. Étudiez dans des établissements prestigieux et
+              immergez-vous dans de nouvelles cultures.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <button className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg font-medium hover:from-blue-600 hover:to-purple-600 transition-all shadow-lg shadow-purple-500/20">
-                Browse Programs
+                Parcourir les Programmes
               </button>
               <button className="px-8 py-4 border border-white/20 rounded-lg font-medium hover:bg-white/10 transition-all">
-                Application Guide
+                Guide de Candidature
               </button>
             </div>
           </div>
@@ -270,7 +224,7 @@ const ExchangePage = () => {
                 <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search programs, universities, or cities..."
+                  placeholder="Rechercher des programmes, universités ou villes..."
                   className="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-700/70 border border-white/5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -281,10 +235,10 @@ const ExchangePage = () => {
                 onClick={() => setShowFilters(!showFilters)}
               >
                 <FiFilter className="mr-2" />
-                <span>Filters</span>
+                <span>Filtres</span>
               </button>
               <button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg font-medium hover:from-blue-600 hover:to-purple-600 transition-all">
-                Search
+                Rechercher
               </button>
             </div>
 
@@ -293,7 +247,7 @@ const ExchangePage = () => {
               <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-white/5">
                 <div>
                   <label className="block text-sm text-gray-400 mb-2">
-                    Country
+                    Pays
                   </label>
                   <select
                     className="w-full px-4 py-2 rounded-lg bg-gray-700/70 border border-white/5 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -309,7 +263,7 @@ const ExchangePage = () => {
                 </div>
                 <div>
                   <label className="block text-sm text-gray-400 mb-2">
-                    Duration
+                    Durée
                   </label>
                   <select
                     className="w-full px-4 py-2 rounded-lg bg-gray-700/70 border border-white/5 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -325,7 +279,7 @@ const ExchangePage = () => {
                 </div>
                 <div>
                   <label className="block text-sm text-gray-400 mb-2">
-                    Scholarship
+                    Type de Programme
                   </label>
                   <div className="flex gap-4">
                     <label className="flex items-center">
@@ -333,14 +287,14 @@ const ExchangePage = () => {
                         type="checkbox"
                         className="form-checkbox rounded bg-gray-700 text-blue-500 mr-2"
                       />
-                      <span>Available</span>
+                      <span>Double Diplôme</span>
                     </label>
                     <label className="flex items-center">
                       <input
                         type="checkbox"
                         className="form-checkbox rounded bg-gray-700 text-blue-500 mr-2"
                       />
-                      <span>Not Required</span>
+                      <span>PFE</span>
                     </label>
                   </div>
                 </div>
@@ -357,18 +311,18 @@ const ExchangePage = () => {
             <div>
               <h2 className="text-3xl font-bold mb-2">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                  Featured Exchange Programs
+                  Programmes d'Échange Recommandés
                 </span>
               </h2>
               <p className="text-gray-400">
-                Discover our most popular international opportunities
+                Découvrez nos opportunités internationales les plus populaires
               </p>
             </div>
             <a
               href="#all-programs"
               className="flex items-center text-blue-400 hover:text-blue-300 transition-colors mt-4 md:mt-0"
             >
-              <span>View all programs</span>
+              <span>Voir tous les programmes</span>
               <FiChevronRight className="ml-1" />
             </a>
           </div>
@@ -421,13 +375,13 @@ const ExchangePage = () => {
                     {program.scholarshipAvailable && (
                       <span className="flex items-center text-xs bg-green-500/20 text-green-300 px-2 py-1 rounded-full">
                         <FiCheck className="mr-1" />
-                        Scholarship
+                        Bourse
                       </span>
                     )}
                     {program.accommodationAvailable && (
                       <span className="flex items-center text-xs bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded-full">
                         <FiCheck className="mr-1" />
-                        Accommodation
+                        Logement
                       </span>
                     )}
                   </div>
@@ -436,7 +390,7 @@ const ExchangePage = () => {
                     onClick={() => setSelectedProgram(program)}
                     className="w-full py-2 px-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg font-medium hover:from-blue-600 hover:to-purple-600 transition-all flex items-center justify-center"
                   >
-                    <span>View Details</span>
+                    <span>Voir les Détails</span>
                     <FiArrowRight className="ml-2" />
                   </button>
                 </div>
@@ -451,11 +405,12 @@ const ExchangePage = () => {
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl font-bold mb-4">
-              Why Choose an Exchange Program?
+              Pourquoi Choisir un Programme d'Échange?
             </h2>
             <p className="text-gray-300">
-              Studying abroad offers unique benefits that go beyond traditional
-              education, preparing you for success in a globalized world.
+              Étudier à l'étranger offre des avantages uniques qui vont au-delà
+              de l'éducation traditionnelle, vous préparant au succès dans un
+              monde globalisé.
             </p>
           </div>
 
@@ -464,11 +419,13 @@ const ExchangePage = () => {
               <div className="w-16 h-16 mb-6 rounded-full bg-blue-500/20 flex items-center justify-center">
                 <FiGlobe className="text-blue-400 text-2xl" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">Global Perspective</h3>
+              <h3 className="text-xl font-semibold mb-3">
+                Perspective Globale
+              </h3>
               <p className="text-gray-300">
-                Immerse yourself in new cultures, languages, and perspectives.
-                Develop a global mindset that will be invaluable in today's
-                interconnected world.
+                Immergez-vous dans de nouvelles cultures, langues et
+                perspectives. Développez une vision mondiale qui sera
+                inestimable dans notre monde interconnecté.
               </p>
             </div>
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-blue-500/30 transition-all">
@@ -476,12 +433,12 @@ const ExchangePage = () => {
                 <FiBook className="text-purple-400 text-2xl" />
               </div>
               <h3 className="text-xl font-semibold mb-3">
-                Academic Excellence
+                Excellence Académique
               </h3>
               <p className="text-gray-300">
-                Access diverse teaching methods, specialized courses, and unique
-                research opportunities that might not be available at your home
-                institution.
+                Accédez à des méthodes d'enseignement diverses, des cours
+                spécialisés et des opportunités de recherche uniques qui ne sont
+                peut-être pas disponibles dans votre établissement d'origine.
               </p>
             </div>
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-blue-500/30 transition-all">
@@ -489,12 +446,13 @@ const ExchangePage = () => {
                 <FiUsers className="text-green-400 text-2xl" />
               </div>
               <h3 className="text-xl font-semibold mb-3">
-                Professional Network
+                Réseau Professionnel
               </h3>
               <p className="text-gray-300">
-                Build an international network of contacts including fellow
-                students, professors, and industry professionals that can open
-                doors throughout your career.
+                Construisez un réseau international de contacts incluant
+                d'autres étudiants, des professeurs et des professionnels de
+                l'industrie qui peuvent ouvrir des portes tout au long de votre
+                carrière.
               </p>
             </div>
           </div>
@@ -506,7 +464,7 @@ const ExchangePage = () => {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-12 text-center">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-              Student Experiences
+              Expériences d'Étudiants
             </span>
           </h2>
 
@@ -542,7 +500,7 @@ const ExchangePage = () => {
                           {testimonial.name}
                         </h4>
                         <p className="text-gray-400">
-                          Exchange Student at {testimonial.university},{" "}
+                          Étudiant(e) d'échange à {testimonial.university},{" "}
                           {testimonial.country} ({testimonial.year})
                         </p>
                       </div>
@@ -571,7 +529,7 @@ const ExchangePage = () => {
       <section id="all-programs" className="py-16 bg-gray-800/30">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8">
-            Explore All Exchange Programs
+            Explorer Tous les Programmes d'Échange
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -602,7 +560,7 @@ const ExchangePage = () => {
                   ))}
                   {program.programs.length > 2 && (
                     <span className="text-xs bg-gray-700 px-2 py-1 rounded-full">
-                      +{program.programs.length - 2} more
+                      +{program.programs.length - 2} plus
                     </span>
                   )}
                 </div>
@@ -612,26 +570,26 @@ const ExchangePage = () => {
                   <span>{program.duration}</span>
                   <span className="mx-2">•</span>
                   <FiCalendar className="mr-2" />
-                  <span>Deadline: {program.deadline}</span>
+                  <span>Date limite: {program.deadline}</span>
                 </div>
 
                 <div className="flex flex-wrap gap-3 mb-4">
                   {program.scholarshipAvailable && (
                     <span className="flex items-center text-xs bg-green-500/20 text-green-300 px-2 py-1 rounded-full">
                       <FiCheck className="mr-1" />
-                      Scholarship
+                      Bourse
                     </span>
                   )}
                   {program.accommodationAvailable && (
                     <span className="flex items-center text-xs bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded-full">
                       <FiCheck className="mr-1" />
-                      Accommodation
+                      Logement
                     </span>
                   )}
                 </div>
 
                 <button className="text-sm text-blue-400 flex items-center mt-2 hover:text-blue-300">
-                  <span>View Details</span>
+                  <span>Voir les Détails</span>
                   <FiArrowRight className="ml-1" />
                 </button>
               </div>
@@ -641,9 +599,11 @@ const ExchangePage = () => {
           {filteredPrograms.length === 0 && (
             <div className="text-center py-12 bg-gray-800/30 rounded-lg border border-white/10">
               <FiInfo className="text-4xl text-gray-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Programs Found</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                Aucun Programme Trouvé
+              </h3>
               <p className="text-gray-400">
-                Try adjusting your search criteria or filters.
+                Essayez d'ajuster vos critères de recherche ou vos filtres.
               </p>
             </div>
           )}
@@ -777,7 +737,7 @@ const ExchangePage = () => {
           </div>
         </div>
       )}
-      <FooterSection/>
+      <FooterSection />
     </div>
   );
 };

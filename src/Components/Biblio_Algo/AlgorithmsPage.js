@@ -12,6 +12,11 @@ import {
   FiLayers,
   FiHexagon,
   FiStar,
+  FiX,
+  FiYoutube,
+  FiLink,
+  FiBook,
+  FiFileText,
 } from "react-icons/fi";
 import Navbar from "../Products/Navbar";
 import FooterSection from "../LandingPage/FooterSection";
@@ -23,8 +28,10 @@ const AlgorithmsPage = () => {
   const [filteredAlgorithms, setFilteredAlgorithms] = useState([]);
   const [featuredAlgorithm, setFeaturedAlgorithm] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
-  // Sample algorithm data
+  // Sample algorithm data with added documentation and resources
   const algorithmsData = [
     {
       id: "quick-sort",
@@ -46,6 +53,47 @@ const AlgorithmsPage = () => {
       ],
       visual: "sorting",
       isFeatured: true,
+      documentation: [
+        {
+          title: "Fonctionnement du Quick Sort",
+          content:
+            "Le Quick Sort fonctionne en sélectionnant un élément 'pivot' dans le tableau, puis en partitionnant les autres éléments en deux sous-tableaux selon qu'ils sont inférieurs ou supérieurs au pivot. L'algorithme est ensuite appliqué récursivement à ces sous-tableaux. Cet algorithme est très efficace en pratique et est souvent utilisé comme algorithme de tri par défaut dans de nombreuses bibliothèques.",
+        },
+        {
+          title: "Cas particuliers et optimisations",
+          content:
+            "Le pire cas de Quick Sort se produit lorsque le pivot est toujours l'élément minimum ou maximum du tableau, ce qui donne une complexité O(n²). Pour éviter cela, plusieurs stratégies de sélection du pivot peuvent être utilisées, comme le choix du pivot médian de trois, ou une sélection aléatoire. Une autre optimisation courante consiste à utiliser l'insertion sort pour les petits sous-tableaux.",
+        },
+      ],
+      videoResources: [
+        {
+          title: "Quick Sort expliqué en 5 minutes",
+          url: "https://www.youtube.com/watch?v=example1",
+          thumbnail: "/api/placeholder/320/180",
+        },
+        {
+          title: "Visualisation du Quick Sort",
+          url: "https://www.youtube.com/watch?v=example2",
+          thumbnail: "/api/placeholder/320/180",
+        },
+      ],
+      externalResources: [
+        {
+          title: "Documentation officielle",
+          url: "https://example.com/quicksort-docs",
+          type: "Documentation",
+        },
+        {
+          title: "Implémentations dans différents langages",
+          url: "https://example.com/quicksort-implementations",
+          type: "Code",
+        },
+        {
+          title: "Benchmark comparatif des algorithmes de tri",
+          url: "https://example.com/sorting-benchmarks",
+          type: "Benchmark",
+        },
+      ],
     },
     {
       id: "binary-search",
@@ -73,6 +121,37 @@ const AlgorithmsPage = () => {
       ],
       visual: "searching",
       isFeatured: false,
+      documentation: [
+        {
+          title: "Principe de la recherche binaire",
+          content:
+            "La recherche binaire est un algorithme fondamental de l'informatique qui permet de trouver la position d'une valeur cible dans un tableau trié. À chaque étape, l'algorithme compare la valeur cible à l'élément au milieu du tableau, puis élimine la moitié dans laquelle la cible ne peut pas se trouver.",
+        },
+        {
+          title: "Conditions et limites d'utilisation",
+          content:
+            "La recherche binaire ne fonctionne que sur des collections déjà triées. Pour des collections non triées, il faut d'abord les trier, ce qui peut avoir un coût en temps supérieur au gain apporté par la recherche binaire, surtout si on ne fait qu'une seule recherche.",
+        },
+      ],
+      videoResources: [
+        {
+          title: "Comprendre la recherche binaire",
+          url: "https://www.youtube.com/watch?v=example3",
+          thumbnail: "/api/placeholder/320/180",
+        },
+      ],
+      externalResources: [
+        {
+          title: "Implémentation optimisée en C++",
+          url: "https://example.com/binary-search-cpp",
+          type: "Code",
+        },
+        {
+          title: "Applications pratiques de la recherche binaire",
+          url: "https://example.com/binary-search-applications",
+          type: "Article",
+        },
+      ],
     },
     {
       id: "dijkstra",
@@ -101,6 +180,42 @@ const AlgorithmsPage = () => {
       ],
       visual: "graph",
       isFeatured: true,
+      documentation: [
+        {
+          title: "Fondements de l'algorithme de Dijkstra",
+          content:
+            "L'algorithme de Dijkstra résout le problème du plus court chemin dans un graphe orienté ou non orienté avec des poids positifs sur les arêtes. Il utilise une approche gloutonne en sélectionnant toujours le nœud non visité ayant la distance minimale depuis la source.",
+        },
+        {
+          title: "Variantes et améliorations",
+          content:
+            "L'implémentation naïve a une complexité O(V²), mais avec une file de priorité comme un tas binaire, elle peut être réduite à O((V+E)log V). Notez que l'algorithme ne fonctionne pas correctement avec des poids négatifs, pour lesquels l'algorithme de Bellman-Ford est plus approprié.",
+        },
+      ],
+      videoResources: [
+        {
+          title: "Algorithme de Dijkstra expliqué pas à pas",
+          url: "https://www.youtube.com/watch?v=example4",
+          thumbnail: "/api/placeholder/320/180",
+        },
+        {
+          title: "Application de Dijkstra dans les GPS",
+          url: "https://www.youtube.com/watch?v=example5",
+          thumbnail: "/api/placeholder/320/180",
+        },
+      ],
+      externalResources: [
+        {
+          title: "Visualiseur interactif de Dijkstra",
+          url: "https://example.com/dijkstra-visualizer",
+          type: "Outil",
+        },
+        {
+          title: "Implémentation avec file à priorité",
+          url: "https://example.com/dijkstra-priority-queue",
+          type: "Code",
+        },
+      ],
     },
     {
       id: "merge-sort",
@@ -124,6 +239,37 @@ const AlgorithmsPage = () => {
       ],
       visual: "sorting",
       isFeatured: false,
+      documentation: [
+        {
+          title: "Le tri fusion expliqué",
+          content:
+            "Le tri fusion est basé sur le principe de diviser pour régner. Il divise récursivement le tableau en deux moitiés, trie chaque moitié, puis fusionne les deux moitiés triées. Ce qui rend le tri fusion particulièrement utile est sa stabilité (les éléments égaux conservent leur ordre relatif) et sa complexité en temps garantie de O(n log n).",
+        },
+        {
+          title: "Avantages et inconvénients",
+          content:
+            "Le principal avantage du tri fusion est sa complexité temporelle garantie de O(n log n), même dans le pire des cas. Son inconvénient majeur est qu'il nécessite O(n) d'espace supplémentaire pour la fusion, contrairement au tri rapide qui trie en place.",
+        },
+      ],
+      videoResources: [
+        {
+          title: "Visualisation du tri fusion",
+          url: "https://www.youtube.com/watch?v=example6",
+          thumbnail: "/api/placeholder/320/180",
+        },
+      ],
+      externalResources: [
+        {
+          title: "Implémentation optimisée du tri fusion",
+          url: "https://example.com/mergesort-optimized",
+          type: "Code",
+        },
+        {
+          title: "Tri fusion vs Tri rapide",
+          url: "https://example.com/mergesort-vs-quicksort",
+          type: "Comparaison",
+        },
+      ],
     },
     {
       id: "dfs",
@@ -146,6 +292,37 @@ const AlgorithmsPage = () => {
       ],
       visual: "graph",
       isFeatured: false,
+      documentation: [
+        {
+          title: "Principe du parcours en profondeur",
+          content:
+            "Le DFS explore un chemin aussi loin que possible avant de revenir en arrière (backtracking) pour explorer d'autres chemins. L'algorithme peut être implémenté de manière récursive ou avec une pile explicite.",
+        },
+        {
+          title: "Applications pratiques",
+          content:
+            "Le DFS est utilisé pour détecter les cycles dans un graphe, résoudre des puzzles comme les labyrinthes, et dans de nombreux problèmes d'intelligence artificielle tels que les jeux et la planification de chemin.",
+        },
+      ],
+      videoResources: [
+        {
+          title: "DFS expliqué simplement",
+          url: "https://www.youtube.com/watch?v=example7",
+          thumbnail: "/api/placeholder/320/180",
+        },
+      ],
+      externalResources: [
+        {
+          title: "Implémentation itérative vs récursive",
+          url: "https://example.com/dfs-implementations",
+          type: "Code",
+        },
+        {
+          title: "Applications du DFS en IA",
+          url: "https://example.com/dfs-ai-applications",
+          type: "Article",
+        },
+      ],
     },
     {
       id: "dynamic-programming",
@@ -169,6 +346,42 @@ const AlgorithmsPage = () => {
       ],
       visual: "dynamic",
       isFeatured: true,
+      documentation: [
+        {
+          title: "Concepts de la programmation dynamique",
+          content:
+            "La programmation dynamique résout des problèmes en les décomposant en sous-problèmes plus simples et en stockant les résultats des sous-problèmes pour éviter de les recalculer. Elle s'applique aux problèmes ayant une structure de sous-problèmes qui se chevauchent et une propriété de sous-structure optimale.",
+        },
+        {
+          title: "Approches top-down et bottom-up",
+          content:
+            "L'approche top-down (mémoïsation) résout le problème récursivement en stockant les résultats dans un cache. L'approche bottom-up (tabulation) commence par résoudre les plus petits sous-problèmes et construit progressivement la solution du problème initial.",
+        },
+      ],
+      videoResources: [
+        {
+          title: "Introduction à la programmation dynamique",
+          url: "https://www.youtube.com/watch?v=example8",
+          thumbnail: "/api/placeholder/320/180",
+        },
+        {
+          title: "Résolution du problème de Fibonacci",
+          url: "https://www.youtube.com/watch?v=example9",
+          thumbnail: "/api/placeholder/320/180",
+        },
+      ],
+      externalResources: [
+        {
+          title: "Catalogue de problèmes de programmation dynamique",
+          url: "https://example.com/dp-problems",
+          type: "Ressource",
+        },
+        {
+          title: "Optimisation de l'espace en programmation dynamique",
+          url: "https://example.com/dp-space-optimization",
+          type: "Technique",
+        },
+      ],
     },
     {
       id: "bfs",
@@ -196,6 +409,37 @@ const AlgorithmsPage = () => {
       ],
       visual: "graph",
       isFeatured: false,
+      documentation: [
+        {
+          title: "Principe du parcours en largeur",
+          content:
+            "Le BFS explore tous les voisins d'un nœud avant de passer à la génération suivante de nœuds. Il utilise une file (FIFO) pour garder trace des nœuds à explorer, contrairement au DFS qui utilise une pile (LIFO).",
+        },
+        {
+          title: "Applications du BFS",
+          content:
+            "Le BFS est particulièrement utile pour trouver le plus court chemin dans un graphe non pondéré, pour l'analyse de réseaux sociaux (comme trouver les connexions à n degrés de séparation), et dans les algorithmes de recherche dans les arbres de jeux.",
+        },
+      ],
+      videoResources: [
+        {
+          title: "BFS vs DFS - Quelle différence?",
+          url: "https://www.youtube.com/watch?v=example10",
+          thumbnail: "/api/placeholder/320/180",
+        },
+      ],
+      externalResources: [
+        {
+          title: "Visualiseur interactif de BFS",
+          url: "https://example.com/bfs-visualizer",
+          type: "Outil",
+        },
+        {
+          title: "BFS dans l'exploration de graphes massifs",
+          url: "https://example.com/bfs-large-graphs",
+          type: "Recherche",
+        },
+      ],
     },
     {
       id: "a-star",
@@ -231,6 +475,47 @@ const AlgorithmsPage = () => {
       ],
       visual: "graph",
       isFeatured: false,
+      documentation: [
+        {
+          title: "Principes de l'algorithme A*",
+          content:
+            "A* combine les avantages de l'algorithme de Dijkstra (qui garantit le plus court chemin) et des algorithmes gloutons (qui utilisent une heuristique pour accélérer la recherche). Il utilise une fonction d'évaluation f(n) = g(n) + h(n), où g(n) est le coût du chemin de départ à n, et h(n) est une heuristique qui estime le coût de n à la destination.",
+        },
+        {
+          title: "Choix de l'heuristique",
+          content:
+            "Le choix de l'heuristique est crucial pour l'efficacité de A*. Une heuristique admissible (qui ne surestime jamais le coût réel) garantit que A* trouvera le chemin optimal. Des heuristiques courantes incluent la distance de Manhattan pour les grilles et la distance euclidienne pour les espaces continus.",
+        },
+      ],
+      videoResources: [
+        {
+          title: "A* expliqué simplement",
+          url: "https://www.youtube.com/watch?v=example11",
+          thumbnail: "/api/placeholder/320/180",
+        },
+        {
+          title: "Implémentation de A* dans les jeux vidéo",
+          url: "https://www.youtube.com/watch?v=example12",
+          thumbnail: "/api/placeholder/320/180",
+        },
+      ],
+      externalResources: [
+        {
+          title: "Simulateur interactif d'A*",
+          url: "https://example.com/astar-simulator",
+          type: "Outil",
+        },
+        {
+          title: "Optimisations avancées d'A*",
+          url: "https://example.com/astar-optimizations",
+          type: "Technique",
+        },
+        {
+          title: "Implémentation d'A* pour la robotique",
+          url: "https://example.com/astar-robotics",
+          type: "Implémentation",
+        },
+      ],
     },
   ];
 
@@ -249,6 +534,19 @@ const AlgorithmsPage = () => {
     { id: "hard", name: "Difficile" },
   ];
 
+  // Function to open the details modal
+  const openAlgorithmDetails = (algorithm) => {
+    setSelectedAlgorithm(algorithm);
+    setShowDetailsModal(true);
+    document.body.classList.add("overflow-hidden");
+  };
+
+  // Function to close the details modal
+  const closeAlgorithmDetails = () => {
+    setShowDetailsModal(false);
+    document.body.classList.remove("overflow-hidden");
+  };
+
   // Function to get a random featured algorithm
   useEffect(() => {
     const featured = algorithmsData.filter((algo) => algo.isFeatured);
@@ -256,7 +554,6 @@ const AlgorithmsPage = () => {
       featured[Math.floor(Math.random() * featured.length)];
     setFeaturedAlgorithm(randomFeatured);
 
-    // Simulate loading
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
@@ -266,19 +563,16 @@ const AlgorithmsPage = () => {
   useEffect(() => {
     let results = [...algorithmsData];
 
-    // Filter by category
     if (selectedCategory !== "all") {
       results = results.filter((algo) => algo.category === selectedCategory);
     }
 
-    // Filter by difficulty
     if (selectedDifficulty !== "all") {
       results = results.filter(
         (algo) => algo.difficulty === selectedDifficulty
       );
     }
 
-    // Filter by search term
     if (searchTerm) {
       results = results.filter(
         (algo) =>
@@ -290,7 +584,6 @@ const AlgorithmsPage = () => {
     setFilteredAlgorithms(results);
   }, [searchTerm, selectedCategory, selectedDifficulty]);
 
-  // Function to get difficulty color
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
       case "easy":
@@ -304,7 +597,6 @@ const AlgorithmsPage = () => {
     }
   };
 
-  // Function to get difficulty text
   const getDifficultyText = (difficulty) => {
     switch (difficulty) {
       case "easy":
@@ -318,13 +610,11 @@ const AlgorithmsPage = () => {
     }
   };
 
-  // Function to get category icon
   const getCategoryIcon = (categoryId) => {
     const category = categories.find((cat) => cat.id === categoryId);
     return category ? category.icon : <FiCode />;
   };
 
-  // Loading animation
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-950 text-gray-200 flex items-center justify-center">
@@ -345,9 +635,9 @@ const AlgorithmsPage = () => {
   return (
     <div className="min-h-screen bg-gray-950 text-gray-200">
       <Navbar />
+
       {/* Hero Section with Featured Algorithm */}
       <div className="relative overflow-hidden">
-        {/* Animated background */}
         <div className="absolute inset-0 bg-gray-900">
           <div className="absolute inset-0 opacity-30">
             <div className="absolute left-0 w-full h-full bg-gradient-to-r from-blue-500/10 to-purple-500/10"></div>
@@ -435,7 +725,10 @@ const AlgorithmsPage = () => {
                         </div>
                       </div>
                     </div>
-                    <button className="inline-flex items-center py-3 px-6 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium rounded-xl transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                    <button
+                      className="inline-flex items-center py-3 px-6 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium rounded-xl transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                      onClick={() => openAlgorithmDetails(featuredAlgorithm)}
+                    >
                       Voir les détails
                       <FiArrowRight className="ml-2" />
                     </button>
@@ -544,6 +837,7 @@ const AlgorithmsPage = () => {
                 <div
                   key={algorithm.id}
                   className="group relative bg-gray-900/30 rounded-xl border border-white/10 overflow-hidden transition-all duration-300 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10"
+                  onClick={() => openAlgorithmDetails(algorithm)}
                 >
                   {/* Animated border gradient on hover */}
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -620,6 +914,195 @@ const AlgorithmsPage = () => {
           )}
         </div>
       </div>
+
+      {/* Algorithm Details Modal */}
+      {showDetailsModal && selectedAlgorithm && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            {/* Background overlay */}
+            <div
+              className="fixed inset-0 transition-opacity"
+              aria-hidden="true"
+              onClick={closeAlgorithmDetails}
+            >
+              <div className="absolute inset-0 bg-black opacity-70"></div>
+            </div>
+
+            {/* Modal container */}
+            <div className="inline-block align-bottom bg-gray-900 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full relative border border-white/10">
+              <button
+                onClick={closeAlgorithmDetails}
+                className="absolute top-4 right-4 p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors"
+              >
+                <FiX className="w-5 h-5 text-gray-400" />
+              </button>
+
+              <div className="px-6 py-6 sm:px-8 sm:py-8">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-2">
+                      {selectedAlgorithm.name}
+                    </h2>
+                    <div className="flex items-center space-x-3 mb-4">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-800 text-gray-300">
+                        {getCategoryIcon(selectedAlgorithm.category)}
+                        <span className="ml-2">
+                          {
+                            categories.find(
+                              (cat) => cat.id === selectedAlgorithm.category
+                            )?.name
+                          }
+                        </span>
+                      </span>
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r ${getDifficultyColor(
+                          selectedAlgorithm.difficulty
+                        )} text-white`}
+                      >
+                        {getDifficultyText(selectedAlgorithm.difficulty)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8 mt-6">
+                  {/* Left column */}
+                  <div>
+                    <div className="mb-6">
+                      <h3 className="text-xl font-semibold mb-3 text-blue-400 flex items-center">
+                        <FiFileText className="mr-2" /> Description
+                      </h3>
+                      <p className="text-gray-300">
+                        {selectedAlgorithm.description}
+                      </p>
+                    </div>
+
+                    <div className="mb-6">
+                      <h3 className="text-xl font-semibold mb-3 text-blue-400 flex items-center">
+                        <FiBook className="mr-2" /> Documentation
+                      </h3>
+                      <div className="space-y-4">
+                        {selectedAlgorithm.documentation.map((doc, index) => (
+                          <div
+                            key={index}
+                            className="bg-gray-800/50 p-4 rounded-lg"
+                          >
+                            <h4 className="font-medium text-gray-200 mb-2">
+                              {doc.title}
+                            </h4>
+                            <p className="text-gray-400 text-sm">
+                              {doc.content}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right column */}
+                  <div>
+                    <div className="mb-6">
+                      <h3 className="text-xl font-semibold mb-3 text-blue-400 flex items-center">
+                        <FiCode className="mr-2" /> Pseudo-code
+                      </h3>
+                      <div className="font-mono text-sm text-gray-300 bg-gray-800/50 p-4 rounded-lg overflow-x-auto">
+                        {selectedAlgorithm.pseudoCode.map((line, index) => (
+                          <div key={index} className="mb-1">
+                            {line}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mb-6">
+                      <h3 className="text-xl font-semibold mb-3 text-blue-400 flex items-center">
+                        <FiYoutube className="mr-2" /> Ressources vidéo
+                      </h3>
+                      <div className="grid gap-3">
+                        {selectedAlgorithm.videoResources.map(
+                          (video, index) => (
+                            <a
+                              key={index}
+                              href={video.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition-colors"
+                            >
+                              <div className="bg-gray-700 w-16 h-10 rounded flex items-center justify-center mr-3">
+                                <FiYoutube className="text-red-500" />
+                              </div>
+                              <span className="text-gray-300">
+                                {video.title}
+                              </span>
+                            </a>
+                          )
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-xl font-semibold mb-3 text-blue-400 flex items-center">
+                        <FiLink className="mr-2" /> Ressources externes
+                      </h3>
+                      <div className="grid gap-2">
+                        {selectedAlgorithm.externalResources.map(
+                          (resource, index) => (
+                            <a
+                              key={index}
+                              href={resource.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition-colors text-sm"
+                            >
+                              <div className="mr-3 text-blue-400">
+                                {resource.type === "Code" ? (
+                                  <FiCode />
+                                ) : resource.type === "Article" ? (
+                                  <FiFileText />
+                                ) : (
+                                  <FiLink />
+                                )}
+                              </div>
+                              <div>
+                                <div className="text-gray-300">
+                                  {resource.title}
+                                </div>
+                                <div className="text-gray-500 text-xs">
+                                  {resource.type}
+                                </div>
+                              </div>
+                            </a>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 grid grid-cols-2 gap-4">
+                  <div className="bg-gray-800/50 p-4 rounded-lg">
+                    <div className="flex items-center text-sm text-gray-400 mb-1">
+                      <FiClock className="mr-2" /> Complexité temporelle
+                    </div>
+                    <div className="text-blue-400 font-mono font-medium">
+                      {selectedAlgorithm.timeComplexity}
+                    </div>
+                  </div>
+                  <div className="bg-gray-800/50 p-4 rounded-lg">
+                    <div className="flex items-center text-sm text-gray-400 mb-1">
+                      <FiLayers className="mr-2" /> Complexité spatiale
+                    </div>
+                    <div className="text-purple-400 font-mono font-medium">
+                      {selectedAlgorithm.spaceComplexity}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <FooterSection />
     </div>
   );

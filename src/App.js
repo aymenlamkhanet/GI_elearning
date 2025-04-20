@@ -12,11 +12,13 @@ import AlgorithmsPage from "./Components/Biblio_Algo/AlgorithmsPage";
 import BiblioFichesPage from "./Components/Biblio_Fiche/BiblioFichesPage";
 import CourseDashboard from "./Components/Cours&Exos/CourseDashboard";
 import OrientationPage from "./Components/Conseils/OrientationPage";
-import DoubleDiplomation from "./Components/Conseils/DoubleDiplomation";
+
 import ExchangePage from "./Components/Conseils/ExchangePage";
 import AdminDashboard from "./Components/Dashboard/AdminDashboard";
 import ProfDashboard from "./Components/Privatespace/Prof/ProfDashboard";
 import QuestionsForum from "./Components/Discussion/QuestionsForum";
+import GI2CourseDashboard from "./Components/Cours&Exos/GI2CourseDashboard";
+import GI3CourseDashboard from "./Components/Cours&Exos/GI3CourseDashboard";
 
 const App = () => {
   return (
@@ -26,12 +28,13 @@ const App = () => {
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
 
         <Route path="/ProfDashboard" element={<ProfDashboard />} />
-        <Route path="/Forum" element={< QuestionsForum/>} />
+        <Route path="/Forum" element={<QuestionsForum />} />
         <Route path="/algos" element={<AlgorithmsPage />} />
         <Route path="/ExchangePage" element={<ExchangePage />} />
-        <Route path="/DoubleDiplomation" element={<DoubleDiplomation />} />
         <Route path="/OrientationPage" element={<OrientationPage />} />
         <Route path="/CourseDashboard" element={<CourseDashboard />} />
+        <Route path="/GI2CourseDashboard" element={<GI2CourseDashboard />} />
+        <Route path="/GI3CourseDashboard" element={<GI3CourseDashboard />} />
         <Route path="/BiblioFiches" element={<BiblioFichesPage />} />
         <Route path="/Biblio-Concours" element={<ConcoursPage />} />
         <Route path="/About" element={<AboutPage />} />

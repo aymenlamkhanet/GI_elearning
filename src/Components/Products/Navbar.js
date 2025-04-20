@@ -50,8 +50,16 @@ const Navbar = () => {
           icon: <FiFileText />,
           link: "/CourseDashboard",
         },
-        { title: "Cours & Exos (GI-2)", icon: <FiFileText />, link: "#" },
-        { title: "Cours & Exos (GI-3)", icon: <FiFileText />, link: "#" },
+        {
+          title: "Cours & Exos (GI-2)",
+          icon: <FiFileText />,
+          link: "/GI2CourseDashboard",
+        },
+        {
+          title: "Cours & Exos (GI-3)",
+          icon: <FiFileText />,
+          link: "/GI3CourseDashboard",
+        },
       ],
     },
     {
@@ -59,8 +67,7 @@ const Navbar = () => {
       icon: <FiInfo />,
       submenu: [
         { title: "Fileres & Conseils", link: "/OrientationPage" },
-        { title: "Double Diplomation", link: "/DoubleDiplomation" },
-        { title: "Echange", link: "/ExchangePage" },
+        { title: "Echange & Double Diplômes", link: "/ExchangePage" },
       ],
     },
     {

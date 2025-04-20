@@ -21,7 +21,7 @@ const Partenaires = () => {
       description:
         "Collaboration stratégique dans le développement de solutions cloud et IA",
       image: orange,
-      website: "https://microsoft.com",
+      website: "https://www.orange.fr/portail",
     },
     {
       name: "Cisco",
