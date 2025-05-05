@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   User,
   Mail,
@@ -31,9 +32,7 @@ const ProfilePage = () => {
     poste: "",
     departement: "",
   });
-   const [passwordError, setPasswordError] = useState("");
-  // Password states
-  const API_URL = "http://localhost:8084/api/chef/67f2e7cbca67094104bf5f40";
+  const [passwordError, setPasswordError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -45,26 +44,22 @@ const ProfilePage = () => {
     confirmPassword: "",
   });
 
+  const API_URL = "http://localhost:8084/api/chef/681755f97a1d6d3dcaa7f204";
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8084/api/chef/67f2e7cbca67094104bf5f40"
-        );
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-        setUserData(data);
-        setEditedData(data);
+        const response = await axios.get(API_URL);
+        setUserData(response.data);
+        setEditedData(response.data);
       } catch (err) {
-        setError(err.message);
+        setError(err.response?.data?.message || err.message);
       } finally {
         setLoading(false);
       }
     };
     fetchData();
   }, []);
-
 
   const handlePasswordUpdate = async () => {
     const { newPassword, confirmPassword } = passwordData;
@@ -89,33 +84,20 @@ const ProfilePage = () => {
         motDePasse: newPassword,
       };
 
-      const response = await fetch(API_URL, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updateData),
-      });
+      const response = await axios.put(API_URL, updateData);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || "Échec de la mise à jour du mot de passe"
-        );
-      }
-
-      const updatedUser = await response.json();
-      setUserData(updatedUser);
+      setUserData(response.data);
       resetPasswordForm();
       setPasswordError("");
     } catch (err) {
-      setPasswordError(err.message);
+      setPasswordError(
+        err.response?.data?.message ||
+          "Erreur lors de la mise à jour du mot de passe"
+      );
     } finally {
       setIsSaving(false);
     }
   };
-
-  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -127,32 +109,19 @@ const ProfilePage = () => {
     setPasswordData((prev) => ({ ...prev, [name]: value }));
   };
 
-  
-
   const saveChanges = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch(API_URL, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(editedData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const updatedData = await response.json();
-      setUserData(updatedData);
+      const response = await axios.put(API_URL, editedData);
+      setUserData(response.data);
       setIsEditing(false);
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setIsSaving(false);
     }
   };
+
   const cancelEditing = () => {
     setEditedData(userData);
     setIsEditing(false);
@@ -173,9 +142,29 @@ const ProfilePage = () => {
     }`;
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!userData) return <div>No user data found</div>;
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login"; // Or use your router to navigate
+  };
+
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        Chargement...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-400">
+        Erreur: {error}
+      </div>
+    );
+  if (!userData)
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        Aucune donnée utilisateur trouvée
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-6">
@@ -469,7 +458,10 @@ const ProfilePage = () => {
             </div>
             {/* Logout */}
             <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <button className="w-full flex items-center justify-center px-4 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-all backdrop-blur-sm border border-red-500/30">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center px-4 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-all backdrop-blur-sm border border-red-500/30"
+              >
                 <LogOut className="w-5 h-5 mr-2" /> Déconnexion
               </button>
             </div>
