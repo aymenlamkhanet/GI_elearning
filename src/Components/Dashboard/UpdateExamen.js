@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { X, Upload, Download } from "lucide-react";
+import axios from "axios";
+import { X, Upload, Download, Save } from "lucide-react";
 
 const UpdateExamen = ({ isOpen, onClose, examenId, onExamenUpdated }) => {
   const [formData, setFormData] = useState({
@@ -15,6 +16,8 @@ const UpdateExamen = ({ isOpen, onClose, examenId, onExamenUpdated }) => {
   const [fileChanged, setFileChanged] = useState(false);
   const [fileName, setFileName] = useState("Aucun fichier sélectionné");
   const [existingFileId, setExistingFileId] = useState(null);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
 
   useEffect(() => {
     if (isOpen && examenId) {
@@ -24,12 +27,12 @@ const UpdateExamen = ({ isOpen, onClose, examenId, onExamenUpdated }) => {
 
   const fetchExamen = async () => {
     try {
-      const response = await fetch(
+      const response = await axios.get(
         `http://localhost:8084/api/examens/${examenId}`
       );
-      const data = await response.json();
+      const data = response.data;
 
-      // Update to match the backend model attributes
+      // Update form data with the fetched data
       setFormData({
         titre: data.titre || "",
         description: data.description || "",
@@ -39,12 +42,25 @@ const UpdateExamen = ({ isOpen, onClose, examenId, onExamenUpdated }) => {
         ratingAvg: data.ratingAvg || 0,
       });
 
+      // Set file information if available
       if (data.fichierId) {
         setFileName("Fichier existant");
         setExistingFileId(data.fichierId);
+      } else {
+        setFileName("Aucun fichier sélectionné");
+        setExistingFileId(null);
       }
+
+      // Reset file changed flag
+      setFileChanged(false);
     } catch (error) {
-      console.error("Error fetching examen:", error);
+      console.error("Fetch Error:", {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+      });
+      setShowErrorAlert(true);
+      setTimeout(() => setShowErrorAlert(false), 2000);
     }
   };
 
@@ -88,20 +104,30 @@ const UpdateExamen = ({ isOpen, onClose, examenId, onExamenUpdated }) => {
     }
 
     try {
-      const response = await fetch(
+      await axios.put(
         `http://localhost:8084/api/examens/update/${examenId}`,
+        formDataToSend,
         {
-          method: "PUT",
-          body: formDataToSend,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
-      if (response.ok) {
+      setShowSuccessAlert(true);
+      setTimeout(() => {
         onExamenUpdated();
         onClose();
-      }
+        setShowSuccessAlert(false);
+      }, 2000);
     } catch (error) {
-      console.error("Error updating examen:", error);
+      console.error("Update Error:", {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+      });
+      setShowErrorAlert(true);
+      setTimeout(() => setShowErrorAlert(false), 2000);
     } finally {
       setIsSubmitting(false);
     }
@@ -120,6 +146,17 @@ const UpdateExamen = ({ isOpen, onClose, examenId, onExamenUpdated }) => {
             <X size={24} />
           </button>
         </div>
+
+        {showSuccessAlert && (
+          <div className="m-4 p-3 bg-green-500/90 text-white rounded-md">
+            Examen mis à jour avec succès !
+          </div>
+        )}
+        {showErrorAlert && (
+          <div className="m-4 p-3 bg-red-500/90 text-white rounded-md">
+            Erreur lors de la mise à jour de l'examen
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -278,7 +315,10 @@ const UpdateExamen = ({ isOpen, onClose, examenId, onExamenUpdated }) => {
                   Enregistrement...
                 </>
               ) : (
-                "Enregistrer"
+                <>
+                  <Save size={18} className="mr-1" />
+                  Enregistrer
+                </>
               )}
             </button>
           </div>

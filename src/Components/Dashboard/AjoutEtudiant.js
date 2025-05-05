@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from 'axios' ;
 import { X } from "lucide-react";
 
 const AjoutEtudiant = ({ isOpen, onClose, onStudentAdded }) => {
@@ -23,20 +24,15 @@ const AjoutEtudiant = ({ isOpen, onClose, onStudentAdded }) => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(
+      const response = await axios.post(
         "http://localhost:8084/api/etudiant/addEtudiant",
+        formData,
         {
-          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
         }
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to add student");
-      }
 
       setShowSuccessAlert(true);
       setTimeout(() => {
@@ -52,7 +48,11 @@ const AjoutEtudiant = ({ isOpen, onClose, onStudentAdded }) => {
         setShowSuccessAlert(false);
       }, 2000);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error:", {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+      });
       setShowErrorAlert(true);
       setTimeout(() => setShowErrorAlert(false), 2000);
     } finally {

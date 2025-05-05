@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { Upload, X, Star } from "lucide-react";
 
 const AddExamen = ({ isOpen, onClose, onExamenAdded }) => {
@@ -54,17 +55,10 @@ const AddExamen = ({ isOpen, onClose, onExamenAdded }) => {
     }
 
     try {
-      const response = await fetch(
+      const response = await axios.post(
         "http://localhost:8084/api/examens/ajouter",
-        {
-          method: "POST",
-          body: formDataToSend,
-        }
+        formDataToSend // Axios automatically handles FormData headers
       );
-
-      if (!response.ok) {
-        throw new Error("Échec de l'ajout de l'examen");
-      }
 
       setShowSuccessAlert(true);
       setTimeout(() => {

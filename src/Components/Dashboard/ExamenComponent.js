@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from 'axios'
 import {
   PlusCircle,
   Search,
@@ -33,15 +34,11 @@ const ExamenComponent = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch("http://localhost:8084/api/examens");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setExamens(data);
+        const response = await axios.get("http://localhost:8084/api/examens");
+        setExamens(response.data);
       } catch (err) {
-        console.error("Error fetching examens:", err);
-        setError(err.message);
+        console.error("Fetch error:", err);
+        setError(err.response?.data?.message || "Failed to load examens");
         setExamens([]);
       } finally {
         setIsLoading(false);
@@ -50,15 +47,15 @@ const ExamenComponent = () => {
     fetchExamens();
   }, []);
 
+  // Manual refresh
   const refreshExamens = async () => {
     try {
-      const response = await fetch("http://localhost:8084/api/examens");
-      const data = await response.json();
-      setExamens(data);
+      const response = await axios.get("http://localhost:8084/api/examens");
+      setExamens(response.data);
       setError(null);
     } catch (error) {
       console.error("Refresh error:", error);
-      setError("Failed to refresh examens");
+      setError(error.response?.data?.message || "Refresh failed");
     }
   };
 
@@ -289,19 +286,22 @@ const ExamenComponent = () => {
                       }}
                       onDelete={async () => {
                         try {
-                          const response = await fetch(
-                            `http://localhost:8084/api/examens/${examen.id}`,
-                            { method: "DELETE" }
+                          await axios.delete(
+                            `http://localhost:8084/api/examens/${examen.id}`
                           );
-                          if (!response.ok) {
-                            throw new Error(
-                              `HTTP error! status: ${response.status}`
-                            );
-                          }
                           refreshExamens();
-                        } catch (err) {
-                          console.error("Error deleting examen:", err);
-                          setError(`Failed to delete examen: ${err.message}`);
+                        } catch (error) {
+                          console.error("Delete Error:", {
+                            status: error.response?.status,
+                            message:
+                              error.response?.data?.message || error.message,
+                            data: error.response?.data,
+                          });
+                          setError(
+                            `Failed to delete examen: ${
+                              error.response?.data?.message || error.message
+                            }`
+                          );
                         }
                       }}
                     />

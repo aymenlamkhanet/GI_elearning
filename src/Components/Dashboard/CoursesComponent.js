@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from 'axios'
 import UpdateCours from "./UpdateCours";
 import AjoutCours from "./AjoutCours";
 import {
@@ -23,23 +24,21 @@ const CoursesComponent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-   const refreshCourses = async () => {
-     try {
-       const response = await fetch("http://localhost:8084/api/cours");
-       const data = await response.json();
-       setCourses(data);
-     } catch (error) {
-       console.error("Error refreshing courses:", error);
-     }
-   };
+  const refreshCourses = async () => {
+    try {
+      const response = await axios.get("http://localhost:8084/api/cours");
+      setCourses(response.data);
+    } catch (error) {
+      console.error("Error refreshing courses:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch("http://localhost:8084/api/cours");
-        const data = await response.json();
-        console.log("API Response:", data);
-        setCourses(data);
+        const response = await axios.get("http://localhost:8084/api/cours");
+        console.log("API Response:", response.data);
+        setCourses(response.data);
       } catch (error) {
         console.error("Error fetching courses:", error);
       }
@@ -235,44 +234,51 @@ const CoursesComponent = () => {
                       setSelectedCourseId(course.id);
                       setIsEditCourseModalOpen(true);
                     }}
-                    onDelete={() => {
-                      fetch(`http://localhost:8084/api/cours/${course.id}`, {
-                        method: "DELETE",
-                        credentials: "include",
-                        headers: {
-                          "Content-Type": "application/json",
-                        },
-                        mode: "cors",
-                      })
-                        .then((response) => {
-                          if (response.ok) {
-                            setCourses((prev) =>
-                              prev.filter((c) => c.id !== course.id)
-                            );
-                          } else {
-                            // Get more detailed error information when possible
-                            return response.text().then((text) => {
-                              throw new Error(
-                                `Failed to delete: ${response.status} ${text}`
-                              );
-                            });
-                          }
-                        })
-                        .catch((error) => {
-                          console.error("Error deleting course:", error);
-                          // Consider showing an error message to the user instead of silently removing
-                          // setCourses(prev => prev.filter(c => c.id !== course.id));
-                        });
+                    onDelete={async () => {
+                      try {
+                        await axios.delete(
+                          `http://localhost:8084/api/cours/${course.id}`
+                        );
+                        setCourses((prev) =>
+                          prev.filter((c) => c.id !== course.id)
+                        );
+                      } catch (error) {
+                        console.error("Delete Error:", error);
+                        alert(
+                          `Failed to delete course: ${
+                            error.response?.data?.message || error.message
+                          }`
+                        );
+                        refreshCourses();
+                      }
                     }}
-                    onDownload={() => {
-                      // For download button, navigate to the same URL but trigger download
-                      const pdfUrl = `http://localhost:8084/api/cours/fichier/${course.fichierId}`;
-                      const a = document.createElement("a");
-                      a.href = pdfUrl;
-                      a.download = `${course.titre || "cours"}.pdf`;
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
+                    onDownload={async () => {
+                      try {
+                        const pdfUrl = `http://localhost:8084/api/cours/fichier/${course.fichierId}`;
+                        const response = await axios.get(pdfUrl, {
+                          responseType: "blob",
+                        });
+
+                        // ... rest of the download logic remains the same
+                        const url = window.URL.createObjectURL(
+                          new Blob([response.data])
+                        );
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = `${course.titre || "cours"}.pdf`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                      } catch (error) {
+                        console.error("Download Error:", error);
+                        alert(
+                          `Failed to download file: ${
+                            error.response?.data?.message ||
+                            "File not available"
+                          }`
+                        );
+                      }
                     }}
                     courseId={course.fichierId}
                   />

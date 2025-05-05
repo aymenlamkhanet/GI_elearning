@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { UploadIcon, XIcon } from "lucide-react";
+import axios from 'axios';
 
 const AjoutCours = ({ isOpen, onClose }) => {
   const initialFormState = {
@@ -40,29 +41,35 @@ const AjoutCours = ({ isOpen, onClose }) => {
     setIsSubmitting(true);
 
     const formDataToSend = new FormData();
-    formDataToSend.append("titre", formData.titre);
-    formDataToSend.append("module", formData.module);
-    formDataToSend.append("description", formData.description);
-    formDataToSend.append("niveau", formData.niveau);
-    formDataToSend.append("duree", formData.duree);
-    formDataToSend.append("liens", formData.liens);
-    formDataToSend.append("ratingAvg", formData.ratingAvg);
-    formDataToSend.append("date", formData.date);
+    // Append all form fields
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && key !== "fichier") {
+        formDataToSend.append(key, value);
+      }
+    });
 
     if (formData.fichier) {
       formDataToSend.append("file", formData.fichier);
     }
 
     try {
-      const response = await fetch("http://localhost:8084/api/cours/ajouter", {
-        method: "POST",
-        body: formDataToSend,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Échec de l'ajout du cours");
-      }
+      const response = await axios.post(
+        "http://localhost:8084/api/cours/ajouter",
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          // Optional: Add upload progress
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            console.log(`Upload progress: ${percentCompleted}%`);
+            // You could set this to state to show a progress bar
+          },
+        }
+      );
 
       setShowSuccessAlert(true);
       setTimeout(() => {
@@ -72,14 +79,18 @@ const AjoutCours = ({ isOpen, onClose }) => {
         setShowSuccessAlert(false);
       }, 2000);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Submission error:", {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+      });
+
       setShowErrorAlert(true);
       setTimeout(() => setShowErrorAlert(false), 2000);
     } finally {
       setIsSubmitting(false);
     }
   };
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
       <div className="bg-[#111827] text-white rounded-xl shadow-lg max-w-[600px] w-full mx-4 border border-white/10">

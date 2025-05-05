@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from 'axios';
 import AjoutOuvrage from "./AjoutOuvrage";
 import UpdateOuvrage from "./UpdateOuvrage";
 import {
@@ -30,21 +31,14 @@ const OuvragesComponent = () => {
   const fetchData = async () => {
     try {
       const [ouvragesRes, modulesRes] = await Promise.all([
-        fetch("http://localhost:8084/api/ouvrages"),
-        fetch("http://localhost:8084/api/ouvrages/modules/distinct"),
+        axios.get("http://localhost:8084/api/ouvrages"),
+        axios.get("http://localhost:8084/api/ouvrages/modules/distinct"),
       ]);
 
-      if (!ouvragesRes.ok || !modulesRes.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const ouvragesData = await ouvragesRes.json();
-      const modulesData = await modulesRes.json();
-
-      setBooks(ouvragesData);
-      setModules(modulesData);
+      setBooks(ouvragesRes.data);
+      setModules(modulesRes.data);
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
@@ -53,46 +47,31 @@ const OuvragesComponent = () => {
   const refreshData = async () => {
     try {
       const [ouvragesRes, modulesRes] = await Promise.all([
-        fetch("http://localhost:8084/api/ouvrages"),
-        fetch("http://localhost:8084/api/ouvrages/modules/distinct"),
+        axios.get("http://localhost:8084/api/ouvrages"),
+        axios.get("http://localhost:8084/api/ouvrages/modules/distinct"),
       ]);
 
-      const ouvragesData = await ouvragesRes.json();
-      const modulesData = await modulesRes.json();
-
-      setBooks(ouvragesData);
-      setModules(modulesData);
+      setBooks(ouvragesRes.data);
+      setModules(modulesRes.data);
+      setError(null);
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || "Refresh failed");
     }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm("Êtes-vous sûr de vouloir supprimer cet ouvrage ?")) {
       try {
-        const response = await fetch(
-          `http://localhost:8084/api/ouvrages/${id}`,
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              // Add any authorization headers if needed
-            },
-          }
-        );
-
-        if (response.ok) {
-          // Update local state only after successful API call
-          setBooks((prev) => prev.filter((b) => b.id !== id));
-          console.log("Ouvrage supprimé avec succès");
-        } else {
-          const errorText = await response.text();
-          console.error("Delete failed:", errorText);
-          alert(`Échec de la suppression: ${errorText}`);
-        }
+        await axios.delete(`http://localhost:8084/api/ouvrages/${id}`);
+        setBooks((prev) => prev.filter((b) => b.id !== id));
+        console.log("Ouvrage supprimé avec succès");
       } catch (error) {
         console.error("Delete error:", error);
-        alert(`Erreur lors de la suppression: ${error.message}`);
+        alert(
+          `Erreur lors de la suppression: ${
+            error.response?.data?.message || error.message
+          }`
+        );
       }
     }
   };

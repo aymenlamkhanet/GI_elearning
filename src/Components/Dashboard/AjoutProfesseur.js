@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { XIcon, Save } from "lucide-react";
+import axios from 'axios';
 
 const AjoutProfesseur = ({ isOpen, onClose, onProfesseurAdded }) => {
   const initialFormState = {
@@ -34,6 +35,8 @@ const AjoutProfesseur = ({ isOpen, onClose, onProfesseurAdded }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Form validation
     if (!validateForm()) {
       setShowErrorAlert(true);
       setTimeout(() => setShowErrorAlert(false), 2000);
@@ -43,18 +46,15 @@ const AjoutProfesseur = ({ isOpen, onClose, onProfesseurAdded }) => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(
+      const response = await axios.post(
         "http://localhost:8084/api/professeur/addProfesseur",
+        formData,
         {
-          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
         }
       );
-
-      if (!response.ok) throw new Error("Échec de l'ajout");
 
       setShowSuccessAlert(true);
       setTimeout(() => {
@@ -64,7 +64,13 @@ const AjoutProfesseur = ({ isOpen, onClose, onProfesseurAdded }) => {
         setShowSuccessAlert(false);
       }, 2000);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Submission Error:", {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+      });
+
+     
       setShowErrorAlert(true);
       setTimeout(() => setShowErrorAlert(false), 2000);
     } finally {

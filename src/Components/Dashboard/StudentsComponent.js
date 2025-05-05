@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from 'axios';
 import {
   PlusCircle,
   Search,
@@ -35,18 +36,22 @@ const StudentsComponent = () => {
   // And in refreshStudents
   const refreshStudents = async () => {
     try {
-      console.log("Starting fetch request");
-      const response = await fetch(
+      console.log("Starting Axios request");
+      const response = await axios.get(
         "http://localhost:8084/api/etudiant/AllEtudiants"
       );
-      console.log("Response received:", response);
-      const data = await response.json();
-      console.log("Data received:", data);
-      setStudents(data);
+      console.log("Axios response received:", response);
+      console.log("Response data:", response.data);
+      setStudents(response.data);
       setLoading(false);
     } catch (error) {
-      console.error("Error refreshing students:", error);
-      setError("Failed to fetch students");
+      console.error("Axios error:", {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        headers: error.response?.headers,
+      });
+      setError(error.response?.data?.message || "Failed to fetch students");
       setLoading(false);
     }
   };
@@ -255,23 +260,34 @@ const StudentsComponent = () => {
                         setSelectedStudentId(student.id);
                         setIsEditModalOpen(true);
                       }}
-                      onDelete={() => {
-                        fetch(
-                          `http://localhost:8084/api/etudiant/${student.id}`,
-                          {
-                            method: "DELETE",
-                          }
-                        )
-                          .then((response) => {
-                            if (response.ok) {
-                              setStudents((prev) =>
-                                prev.filter((s) => s.id !== student.id)
-                              );
-                            }
-                          })
-                          .catch((error) => {
-                            console.error("Error deleting student:", error);
+                      onDelete={async () => {
+                        try {
+                          await axios.delete(
+                            `http://localhost:8084/api/etudiant/${student.id}`
+                          );
+                          // Only update state if API call succeeds
+                          setStudents((prev) =>
+                            prev.filter((s) => s.id !== student.id)
+                          );
+                        } catch (error) {
+                          console.error("Delete Error:", {
+                            status: error.response?.status,
+                            message:
+                              error.response?.data?.message || error.message,
+                            data: error.response?.data,
                           });
+
+                          // Show user-friendly error message
+                          alert(
+                            `Failed to delete student: ${
+                              error.response?.data?.message ||
+                              "Please try again"
+                            }`
+                          );
+
+                          // Optional: Re-fetch student list to ensure sync with server
+                          // fetchStudents();
+                        }
                       }}
                       studentId={student.id}
                     />

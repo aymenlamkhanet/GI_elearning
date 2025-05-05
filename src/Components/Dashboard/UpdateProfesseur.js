@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { XIcon, Save } from "lucide-react";
-
+import axios from 'axios';
 const UpdateProfesseur = ({
   isOpen,
   onClose,
@@ -28,14 +28,16 @@ const UpdateProfesseur = ({
 
   const fetchProfesseurData = async () => {
     try {
-      const response = await fetch(
+      const response = await axios.get(
         `http://localhost:8084/api/professeur/${professeurId}`
       );
-      if (!response.ok) throw new Error("Failed to fetch data");
-      const data = await response.json();
-      setFormData(data);
+      setFormData(response.data);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Fetch Error:", {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+      });
       setShowErrorAlert(true);
       setTimeout(() => setShowErrorAlert(false), 2000);
     }
@@ -51,18 +53,16 @@ const UpdateProfesseur = ({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(
+      const response = await axios.put(
         `http://localhost:8084/api/professeur/${professeurId}`,
+        formData,
         {
-          method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Add if using auth
           },
-          body: JSON.stringify(formData),
         }
       );
-
-      if (!response.ok) throw new Error("Échec de la mise à jour");
 
       setShowSuccessAlert(true);
       setTimeout(() => {
@@ -71,14 +71,18 @@ const UpdateProfesseur = ({
         setShowSuccessAlert(false);
       }, 2000);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Update error:", {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+      });
+
       setShowErrorAlert(true);
       setTimeout(() => setShowErrorAlert(false), 2000);
     } finally {
       setIsSubmitting(false);
     }
   };
-
   if (!isOpen) return null;
 
   return (

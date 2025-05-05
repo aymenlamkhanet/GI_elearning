@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Save, X, Upload } from "lucide-react";
+import axios from 'axios';
 
 const UpdateOuvrage = ({
   isOpen,
@@ -34,12 +35,11 @@ const UpdateOuvrage = ({
       if (!isOpen || !ouvrageId) return;
 
       try {
-        const response = await fetch(
+        const response = await axios.get(
           `http://localhost:8084/api/ouvrages/${ouvrageId}`
         );
-        if (!response.ok) throw new Error("Failed to fetch ouvrage");
 
-        const ouvrageData = await response.json();
+        const ouvrageData = response.data;
 
         setFormData({
           titre: ouvrageData.titre || "",
@@ -100,18 +100,15 @@ const UpdateOuvrage = ({
     }
 
     try {
-      const response = await fetch(
+      const response = await axios.put(
         `http://localhost:8084/api/ouvrages/${ouvrageId}`,
+        formDataToSend,
         {
-          method: "PUT",
-          body: formDataToSend,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update ouvrage");
-      }
 
       setShowSuccessAlert(true);
       setTimeout(() => {
@@ -120,7 +117,7 @@ const UpdateOuvrage = ({
         setShowSuccessAlert(false);
       }, 2000);
     } catch (error) {
-      console.error("Update error:", error.message);
+      console.error("Update error:", error);
       setShowErrorAlert(true);
       setTimeout(() => setShowErrorAlert(false), 2000);
     } finally {

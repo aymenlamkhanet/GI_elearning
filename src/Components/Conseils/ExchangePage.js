@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import img1 from "./bourges-360.jpg";
+import img2 from "./images.jpeg";
+import img3 from "./download.jpeg";
 import { 
   FiGlobe, 
   FiCalendar, 
@@ -24,7 +27,7 @@ const exchangePrograms = [
     university: "INSA Centre Val De Loire",
     country: "France",
     city: "Blois",
-    image: "/api/placeholder/800/500",
+    image: img1,
     flag: "🇫🇷",
     programs: ["Double Diplomation", "Échange", "PFE"],
     duration: "1-2 semesters",
@@ -43,7 +46,7 @@ const exchangePrograms = [
     university: "POLYTECH Angers",
     country: "France",
     city: "Angers",
-    image: "/api/placeholder/800/500",
+    image: img2,
     flag: "🇫🇷",
     programs: ["PFE", "Semester Study"],
     duration: "1-2 semesters",
@@ -62,7 +65,7 @@ const exchangePrograms = [
     university: "INSA DE Toulouse",
     country: "France",
     city: "Toulouse",
-    image: "/api/placeholder/800/500",
+    image: img3,
     flag: "🇫🇷",
     programs: ["Exchange Program"],
     duration: "1 semester",

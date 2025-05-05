@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Upload, X } from "lucide-react";
+import axios from 'axios';
 
 const AddExercise = ({ isOpen, onClose, onExerciseAdded }) => {
   const initialFormState = {
@@ -50,17 +51,15 @@ const AddExercise = ({ isOpen, onClose, onExerciseAdded }) => {
     }
 
     try {
-      const response = await fetch(
+      const response = await axios.post(
         "http://localhost:8084/api/exercices/ajouter",
+        formDataToSend,
         {
-          method: "POST",
-          body: formDataToSend,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
-
-      if (!response.ok) {
-        throw new Error("Échec de l'ajout de l'exercice");
-      }
 
       setShowSuccessAlert(true);
       setTimeout(() => {
@@ -71,7 +70,11 @@ const AddExercise = ({ isOpen, onClose, onExerciseAdded }) => {
         onExerciseAdded();
       }, 2000);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error:", {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
       setShowErrorAlert(true);
       setTimeout(() => setShowErrorAlert(false), 2000);
     } finally {

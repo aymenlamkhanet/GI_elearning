@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { UploadIcon, XIcon } from "lucide-react";
+import axios from 'axios';
 
 const AjoutOuvrage = ({ isOpen, onClose, modules, onOuvrageAdded }) => {
   const initialFormState = {
@@ -41,29 +42,36 @@ const AjoutOuvrage = ({ isOpen, onClose, modules, onOuvrageAdded }) => {
     setIsSubmitting(true);
 
     const formDataToSend = new FormData();
+    // Append all non-file fields
     Object.entries(formData).forEach(([key, value]) => {
       if (key !== "fichier" && value !== null) {
         formDataToSend.append(key, value);
       }
     });
 
+    // Append file if exists
     if (formData.fichier) {
       formDataToSend.append("file", formData.fichier);
     }
 
     try {
-      const response = await fetch(
+      const response = await axios.post(
         "http://localhost:8084/api/ouvrages/ajouter",
+        formDataToSend,
         {
-          method: "POST",
-          body: formDataToSend,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          // Optional: Add upload progress callback
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            console.log(`Upload Progress: ${percentCompleted}%`);
+            // Update progress state if needed
+          },
         }
       );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Échec de l'ajout de l'ouvrage");
-      }
 
       setShowSuccessAlert(true);
       setTimeout(() => {
@@ -74,7 +82,11 @@ const AjoutOuvrage = ({ isOpen, onClose, modules, onOuvrageAdded }) => {
         setShowSuccessAlert(false);
       }, 2000);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Submission Error:", {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+      });
       setShowErrorAlert(true);
       setTimeout(() => setShowErrorAlert(false), 2000);
     } finally {

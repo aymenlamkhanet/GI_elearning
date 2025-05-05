@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { X, Upload, Download } from "lucide-react";
+import axios from "axios";
+import { X, Upload, Download, Save } from "lucide-react";
 
 const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
   const [formData, setFormData] = useState({
@@ -15,6 +16,8 @@ const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
   const [fileChanged, setFileChanged] = useState(false);
   const [fileName, setFileName] = useState("Aucun fichier sélectionné");
   const [existingFileId, setExistingFileId] = useState(null);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
 
   useEffect(() => {
     if (isOpen && exerciseId) {
@@ -24,26 +27,38 @@ const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
 
   const fetchExercise = async () => {
     try {
-      const response = await fetch(
+      const response = await axios.get(
         `http://localhost:8084/api/exercices/${exerciseId}`
       );
-      const data = await response.json();
+      const data = response.data;
 
       setFormData({
-        titre: data.titre,
-        description: data.description,
-        module: data.module,
-        niveau: data.niveau,
-        ratingAvg: data.ratingAvg,
+        titre: data.titre || "",
+        description: data.description || "",
+        module: data.module || "",
+        niveau: data.niveau || "",
+        ratingAvg: data.ratingAvg || 0,
         date: data.date ? new Date(data.date).toISOString().slice(0, 16) : "",
       });
 
       if (data.fichierId) {
         setFileName("Fichier existant");
         setExistingFileId(data.fichierId);
+      } else {
+        setFileName("Aucun fichier sélectionné");
+        setExistingFileId(null);
       }
+
+      // Reset file changed flag
+      setFileChanged(false);
     } catch (error) {
-      console.error("Error fetching exercise:", error);
+      console.error("Fetch Error:", {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+      });
+      setShowErrorAlert(true);
+      setTimeout(() => setShowErrorAlert(false), 2000);
     }
   };
 
@@ -87,20 +102,30 @@ const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
     }
 
     try {
-      const response = await fetch(
+      await axios.put(
         `http://localhost:8084/api/exercices/update/${exerciseId}`,
+        formDataToSend,
         {
-          method: "PUT",
-          body: formDataToSend,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
-      if (response.ok) {
+      setShowSuccessAlert(true);
+      setTimeout(() => {
         onExerciseUpdated();
         onClose();
-      }
+        setShowSuccessAlert(false);
+      }, 2000);
     } catch (error) {
-      console.error("Error updating exercise:", error);
+      console.error("Update Error:", {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+      });
+      setShowErrorAlert(true);
+      setTimeout(() => setShowErrorAlert(false), 2000);
     } finally {
       setIsSubmitting(false);
     }
@@ -109,7 +134,7 @@ const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
       <div className="bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl border border-gray-700">
         <div className="flex justify-between items-center border-b border-gray-700 p-4">
           <h2 className="text-xl font-semibold text-white">
@@ -119,6 +144,17 @@ const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
             <X size={24} />
           </button>
         </div>
+
+        {showSuccessAlert && (
+          <div className="m-4 p-3 bg-green-500/90 text-white rounded-md">
+            Exercice mis à jour avec succès !
+          </div>
+        )}
+        {showErrorAlert && (
+          <div className="m-4 p-3 bg-red-500/90 text-white rounded-md">
+            Erreur lors de la mise à jour de l'exercice
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -276,7 +312,10 @@ const UpdateExercise = ({ isOpen, onClose, exerciseId, onExerciseUpdated }) => {
                   Enregistrement...
                 </>
               ) : (
-                "Enregistrer"
+                <>
+                  <Save size={18} className="mr-1" />
+                  Enregistrer
+                </>
               )}
             </button>
           </div>

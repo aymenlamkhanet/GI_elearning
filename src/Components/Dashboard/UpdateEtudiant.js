@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from 'axios';
 import { Save, X } from "lucide-react";
 
 const UpdateEtudiant = ({ isOpen, onClose, studentId, onStudentUpdated }) => {
@@ -21,14 +22,16 @@ const UpdateEtudiant = ({ isOpen, onClose, studentId, onStudentUpdated }) => {
 
   const fetchStudentData = async () => {
     try {
-      const response = await fetch(
+      const response = await axios.get(
         `http://localhost:8084/api/etudiant/${studentId}`
       );
-      if (!response.ok) throw new Error("Failed to fetch student data");
-      const studentData = await response.json();
-      setFormData(studentData);
+      setFormData(response.data);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Fetch Error:", {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+      });
       setShowErrorAlert(true);
       setTimeout(() => setShowErrorAlert(false), 2000);
     }
@@ -44,27 +47,28 @@ const UpdateEtudiant = ({ isOpen, onClose, studentId, onStudentUpdated }) => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(
+      const response = await axios.put(
         `http://localhost:8084/api/etudiant/${studentId}`,
+        formData,
         {
-          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
         }
       );
-
-      if (!response.ok) throw new Error(await response.text());
 
       setShowSuccessAlert(true);
       setTimeout(() => {
         onClose();
-        onStudentUpdated();
+        onStudentUpdated?.();
         setShowSuccessAlert(false);
       }, 2000);
     } catch (error) {
-      console.error("Update error:", error);
+      console.error("Update Error:", {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+      });
       setShowErrorAlert(true);
       setTimeout(() => setShowErrorAlert(false), 2000);
     } finally {

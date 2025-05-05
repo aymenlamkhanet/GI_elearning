@@ -12,13 +12,27 @@ import AlgorithmsPage from "./Components/Biblio_Algo/AlgorithmsPage";
 import BiblioFichesPage from "./Components/Biblio_Fiche/BiblioFichesPage";
 import CourseDashboard from "./Components/Cours&Exos/CourseDashboard";
 import OrientationPage from "./Components/Conseils/OrientationPage";
-
 import ExchangePage from "./Components/Conseils/ExchangePage";
 import AdminDashboard from "./Components/Dashboard/AdminDashboard";
 import ProfDashboard from "./Components/Privatespace/Prof/ProfDashboard";
 import QuestionsForum from "./Components/Discussion/QuestionsForum";
 import GI2CourseDashboard from "./Components/Cours&Exos/GI2CourseDashboard";
 import GI3CourseDashboard from "./Components/Cours&Exos/GI3CourseDashboard";
+import axios from "axios";
+
+// Set up Axios to include the token in headers
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 const App = () => {
   return (

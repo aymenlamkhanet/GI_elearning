@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from 'axios';
 import AjoutProfesseur from "./AjoutProfesseur";
 import UpdateProfesseur from "./UpdateProfesseur";
 import {
@@ -20,16 +21,12 @@ const ProfesseurComponent = () => {
 
   const fetchProfesseurs = async () => {
     try {
-      const response = await fetch(
+      const response = await axios.get(
         "http://localhost:8084/api/professeur/AllProfesseurs"
       );
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-      setProfesseurs(data);
+      setProfesseurs(response.data);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to fetch professors");
     } finally {
       setLoading(false);
     }

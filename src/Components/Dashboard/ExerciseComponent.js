@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   PlusCircle,
   Search,
@@ -36,12 +37,9 @@ const ExerciseComponent = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch("http://localhost:8084/api/exercices");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setExercises(data);
+        // Axios will now auto-add the token via the interceptor
+        const response = await axios.get("http://localhost:8084/api/exercices");
+        setExercises(response.data); // Axios response data is in .data
       } catch (err) {
         console.error("Error fetching exercises:", err);
         setError(err.message);
@@ -102,24 +100,12 @@ const ExerciseComponent = () => {
   // Action handlers
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(
-        `http://localhost:8084/api/exercices/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete exercise");
-      }
-
+      await axios.delete(`http://localhost:8084/api/exercices/${id}`);
       setExercises(exercises.filter((ex) => ex.id !== id));
-    } catch (error) {
-      console.error("Delete error:", error);
-      setError("Failed to delete exercise");
+      setError(null);
+    } catch (err) {
+      console.error("Delete error:", err);
+      setError(err.response?.data?.message || "Failed to delete exercise");
     }
   };
 
@@ -129,15 +115,14 @@ const ExerciseComponent = () => {
         throw new Error("No file associated with this exercise");
       }
 
-      const response = await fetch(
-        `http://localhost:8084/api/exercices/fichier/${exercise.fichierId}`
+      const response = await axios.get(
+        `http://localhost:8084/api/exercices/fichier/${exercise.fichierId}`,
+        {
+          responseType: "blob",
+        }
       );
-      if (!response.ok) {
-        throw new Error("Failed to download file");
-      }
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
       link.download = `${exercise.titre || "exercise"}.pdf`;
@@ -145,21 +130,20 @@ const ExerciseComponent = () => {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Download error:", error);
-      setError("Failed to download file");
+    } catch (err) {
+      console.error("Download error:", err);
+      setError(err.response?.data?.message || "Failed to download file");
     }
   };
 
   const refreshExercises = async () => {
     try {
-      const response = await fetch("http://localhost:8084/api/exercices");
-      const data = await response.json();
-      setExercises(data);
+      const response = await axios.get("http://localhost:8084/api/exercices");
+      setExercises(response.data);
       setError(null);
-    } catch (error) {
-      console.error("Refresh error:", error);
-      setError("Failed to refresh exercises");
+    } catch (err) {
+      console.error("Refresh error:", err);
+      setError(err.response?.data?.message || "Failed to refresh exercises");
     }
   };
 
