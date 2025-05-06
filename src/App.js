@@ -19,6 +19,7 @@ import QuestionsForum from "./Components/Discussion/QuestionsForum";
 import GI2CourseDashboard from "./Components/Cours&Exos/GI2CourseDashboard";
 import GI3CourseDashboard from "./Components/Cours&Exos/GI3CourseDashboard";
 import axios from "axios";
+import ExerciseDashboard from "./Components/Dashboard/ExerciseDashboard";
 
 // Set up Axios to include the token in headers
 axios.interceptors.request.use(
@@ -40,7 +41,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
-
+        <Route path="/ExosDashboard" element={<ExerciseDashboard/>}/>
         <Route path="/ProfDashboard" element={<ProfDashboard />} />
         <Route path="/Forum" element={<QuestionsForum />} />
         <Route path="/algos" element={<AlgorithmsPage />} />

@@ -8,20 +8,7 @@ import ExerciseComponent from "./ExerciseComponent";
 import OuvragesComponent from "./OuvragesComponent";
 import ProfilePage from "./ProfilePage";
 import RapportsPage from "./RapportsPage";
-import {
-  LineChart,
-  BarChart,
-  PieChart,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  Line,
-  Bar,
-  Pie,
-  Cell,
-} from "recharts";
+import ExerciseDashboard from "./ExerciseDashboard";
 import {
   Home,
   GraduationCap,
@@ -37,6 +24,7 @@ import {
   AlertCircle,
   Loader,
 } from "lucide-react";
+import OuvrageDashboard from "./OuvrageDashboard";
 
 // API base URL - change this to match your Spring Boot backend
 const API_BASE_URL = "http://localhost:8084/api";
@@ -67,219 +55,126 @@ const DashboardStats = ({ loading, stats }) => {
     return (
       <div className="flex items-center justify-center h-64">
         <AlertCircle className="w-8 h-8 text-red-400" />
-        <span className="ml-2 text-gray-300">
-          Impossible de charger les statistiques
-        </span>
+        <span className="ml-2 text-gray-300">Aucune donnée disponible</span>
       </div>
     );
   }
 
-  // Chart data for distribution
-  const distributionData = [
-    { name: "Étudiants", value: stats.totalStudents },
-    { name: "Professeurs", value: stats.totalProfessors },
-    { name: "Cours", value: stats.totalCourses },
-    { name: "Examens", value: stats.totalExams },
-    { name: "Exercices", value: stats.totalExercises },
-    { name: "Ouvrages", value: stats.totalBooks },
-  ];
-
-  // Activity data
-  const activityData = stats.activityData || [
-    { month: "Jan", students: 20, exams: 5 },
-    { month: "Fév", students: 25, exams: 8 },
-    { month: "Mar", students: 30, exams: 12 },
-    { month: "Avr", students: 40, exams: 15 },
-    { month: "Mai", students: 45, exams: 20 },
-  ];
-
-  // Performance data
-  const performanceData = stats.performanceData || [
-    { name: "Excellent", value: stats.excellentPerformance || 30 },
-    { name: "Bon", value: stats.goodPerformance || 45 },
-    { name: "Moyen", value: stats.averagePerformance || 15 },
-    { name: "Faible", value: stats.poorPerformance || 10 },
-  ];
-
   return (
     <div className="space-y-8">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Étudiants"
           value={stats.totalStudents}
-          icon={<GraduationCap className="w-6 h-6" />}
-          color="bg-blue-500"
+          icon={<GraduationCap className="w-5 h-5" />}
+          trend={stats.studentTrend}
         />
         <StatCard
           title="Professeurs"
           value={stats.totalProfessors}
-          icon={<UserCheck className="w-6 h-6" />}
-          color="bg-green-500"
+          icon={<UserCheck className="w-5 h-5" />}
+          trend={stats.professorTrend}
         />
         <StatCard
-          title="Cours"
-          value={stats.totalCourses}
-          icon={<BookIcon className="w-6 h-6" />}
-          color="bg-purple-500"
+          title="Cours Actifs"
+          value={stats.totalCours}
+          icon={<BookIcon className="w-5 h-5" />}
+          trend={stats.courseTrend}
         />
         <StatCard
-          title="Examens"
+          title="Examens à Venir"
           value={stats.totalExams}
-          icon={<ClipboardList className="w-6 h-6" />}
-          color="bg-red-500"
-        />
-        <StatCard
-          title="Exercices"
-          value={stats.totalExercises}
-          icon={<FileSpreadsheet className="w-6 h-6" />}
-          color="bg-yellow-500"
-        />
-        <StatCard
-          title="Ouvrages"
-          value={stats.totalBooks}
-          icon={<Layers className="w-6 h-6" />}
-          color="bg-indigo-500"
+          icon={<ClipboardList className="w-5 h-5" />}
+          trend={stats.examTrend}
         />
       </div>
 
-      {/* Charts */}
+      {/* Recent Activity Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Distribution Pie Chart */}
-        <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-white/10">
+        {/* Recent Students */}
+        <div className="bg-gray-800/50 p-6 rounded-xl border border-white/10">
           <h3 className="text-lg font-medium text-gray-200 mb-4">
-            Distribution des ressources
+            Derniers Étudiants Inscrits
           </h3>
-          <div className="flex justify-center">
-            <PieChart width={300} height={300}>
-              <Pie
-                data={distributionData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="value"
-                label={({ name, percent }) =>
-                  `${name} ${(percent * 100).toFixed(0)}%`
-                }
-              >
-                {distributionData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </div>
+          {stats.latestStudents?.length > 0 ? (
+            <div className="space-y-4">
+              {stats.latestStudents.map((student) => (
+                <div
+                  key={student.id}
+                  className="flex items-center justify-between p-3 bg-gray-700/20 rounded-lg"
+                >
+                  <div>
+                    <p className="text-gray-200 font-medium">{student.nom}</p>
+                    <p className="text-sm text-gray-400">{student.email}</p>
+                  </div>
+                  <span className="text-sm text-gray-400">
+                    {student.niveau}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-400 text-center py-4">
+              Aucun étudiant récent
+            </p>
+          )}
         </div>
 
-        {/* Activity Bar Chart */}
-        <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-white/10">
+        {/* Recent Professors */}
+        <div className="bg-gray-800/50 p-6 rounded-xl border border-white/10">
           <h3 className="text-lg font-medium text-gray-200 mb-4">
-            Activité mensuelle
+            Derniers Professeurs Ajoutés
           </h3>
-          <BarChart width={500} height={300} data={activityData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-            <XAxis dataKey="month" stroke="#888" />
-            <YAxis stroke="#888" />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "#1f2937",
-                border: "1px solid #374151",
-                borderRadius: "0.375rem",
-              }}
-              labelStyle={{ color: "#e5e7eb" }}
-              itemStyle={{ color: "#e5e7eb" }}
-            />
-            <Legend />
-            <Bar dataKey="students" name="Étudiants" fill="#0088FE" />
-            <Bar dataKey="exams" name="Examens" fill="#00C49F" />
-          </BarChart>
+          {stats.latestProfessors?.length > 0 ? (
+            <div className="space-y-4">
+              {stats.latestProfessors.map((professor) => (
+                <div
+                  key={professor.id}
+                  className="flex items-center justify-between p-3 bg-gray-700/20 rounded-lg"
+                >
+                  <div>
+                    <p className="text-gray-200 font-medium">{professor.nom}</p>
+                    <p className="text-sm text-gray-400">{professor.module}</p>
+                  </div>
+                  <span className="text-sm text-gray-400">
+                    {professor.phone}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-400 text-center py-4">
+              Aucun professeur récent
+            </p>
+          )}
         </div>
-
-        {/* Performance Pie Chart */}
-        <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-white/10">
-          <h3 className="text-lg font-medium text-gray-200 mb-4">
-            Performance des étudiants
-          </h3>
-          <div className="flex justify-center">
-            <PieChart width={300} height={300}>
-              <Pie
-                data={performanceData}
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="value"
-                label={({ name, percent }) =>
-                  `${name} ${(percent * 100).toFixed(0)}%`
-                }
-              >
-                {performanceData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </div>
-        </div>
-
-        {/* Recent Activity Line Chart */}
-        <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-white/10">
-          <h3 className="text-lg font-medium text-gray-200 mb-4">
-            Tendances récentes
-          </h3>
-          <LineChart width={500} height={300} data={activityData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-            <XAxis dataKey="month" stroke="#888" />
-            <YAxis stroke="#888" />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "#1f2937",
-                border: "1px solid #374151",
-                borderRadius: "0.375rem",
-              }}
-              labelStyle={{ color: "#e5e7eb" }}
-              itemStyle={{ color: "#e5e7eb" }}
-            />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="students"
-              name="Étudiants"
-              stroke="#0088FE"
-              activeDot={{ r: 8 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="exams"
-              name="Examens"
-              stroke="#00C49F"
-            />
-          </LineChart>
-        </div>
+        <ExerciseDashboard/>
+        <OuvrageDashboard/>
       </div>
     </div>
   );
 };
 
 // Stat Card Component
-const StatCard = ({ title, value, icon, color }) => {
+const StatCard = ({ title, value, icon, trend }) => {
+  const trendColor = trend > 0 ? "text-green-400" : "text-red-400";
+  const trendIcon = trend > 0 ? "↑" : "↓";
+
   return (
-    <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-white/10 flex items-center">
-      <div className={`${color} p-3 rounded-lg`}>{icon}</div>
-      <div className="ml-4">
-        <h3 className="text-gray-400 text-sm">{title}</h3>
-        <p className="text-2xl font-semibold text-white">{value || 0}</p>
+    <div className="bg-gray-800/50 p-4 rounded-xl border border-white/10 flex items-center justify-between">
+      <div className="flex items-center space-x-4">
+        <div className="p-2 bg-gray-700/30 rounded-lg">{icon}</div>
+        <div>
+          <h3 className="text-gray-400 text-sm">{title}</h3>
+          <p className="text-2xl font-semibold text-white">{value || 0}</p>
+        </div>
       </div>
+      {trend !== undefined && (
+        <div className={`text-sm ${trendColor}`}>
+          {trendIcon} {Math.abs(trend)}%
+        </div>
+      )}
     </div>
   );
 };
@@ -294,37 +189,49 @@ const EnhancedDashboardComponent = () => {
     const fetchDashboardStats = async () => {
       try {
         setLoading(true);
-        // Call to DashboardController
-        const response = await axios.get(`${API_BASE_URL}/dashboard/stats`);
-        setStats(response.data);
         setError(null);
+
+        const [
+          studentCount,
+          professorCount,
+          bookCount,
+          reportCount,
+          examCount,
+          exerciseCount,
+          coursCount,
+        ] = await Promise.all([
+          axios.get(`${API_BASE_URL}/etudiant/count`),
+          axios.get(`${API_BASE_URL}/professeur/count`),
+          axios.get(`${API_BASE_URL}/ouvrages/count`),
+          axios.get(`${API_BASE_URL}/report/count`),
+          axios.get(`${API_BASE_URL}/examens/count`),
+          axios.get(`${API_BASE_URL}/exercices/count`),
+          axios.get(`${API_BASE_URL}/exercices/count`),
+          axios.get(`${API_BASE_URL}/cours/count`),
+        ]);
+
+        const [latestStudents, latestProfessors] = await Promise.all([
+          axios.get(`${API_BASE_URL}/etudiant/recent`),
+          axios.get(`${API_BASE_URL}/professeur/recent`),
+        ]);
+
+        
+
+        setStats({
+          totalStudents: studentCount.data,
+          totalProfessors: professorCount.data,
+          totalBooks: bookCount.data,
+          totalReports: reportCount.data,
+          totalCours: coursCount.data,
+          totalExams: examCount.data,
+          totalExercises: exerciseCount.data,
+          latestStudents: latestStudents.data,
+          latestProfessors: latestProfessors.data,
+        });
       } catch (err) {
         console.error("Failed to fetch dashboard statistics:", err);
-        setError(
-          "Impossible de charger les statistiques. Veuillez réessayer plus tard."
-        );
-        // Fallback to demo data if API fails
-        setStats({
-          totalStudents: 245,
-          totalProfessors: 32,
-          totalCourses: 58,
-          totalExams: 124,
-          totalExercises: 367,
-          totalBooks: 89,
-          activityData: [
-            { month: "Jan", students: 20, exams: 5 },
-            { month: "Fév", students: 25, exams: 8 },
-            { month: "Mar", students: 30, exams: 12 },
-            { month: "Avr", students: 40, exams: 15 },
-            { month: "Mai", students: 45, exams: 20 },
-          ],
-          performanceData: [
-            { name: "Excellent", value: 30 },
-            { name: "Bon", value: 45 },
-            { name: "Moyen", value: 15 },
-            { name: "Faible", value: 10 },
-          ],
-        });
+        setError("Erreur lors du chargement des données");
+        setStats({});
       } finally {
         setLoading(false);
       }
@@ -360,31 +267,18 @@ const EnhancedStudentsComponent = () => {
     const fetchStudentsData = async () => {
       try {
         setLoading(true);
-        // Call to StudentController
-        const studentsResponse = await axios.get(`${API_BASE_URL}/students`);
-        setStudents(studentsResponse.data);
-
-        // Call to StudentController for stats
-        const statsResponse = await axios.get(`${API_BASE_URL}/students/stats`);
-        setStats(statsResponse.data);
-
         setError(null);
+        const [studentsResponse, statsResponse] = await Promise.all([
+          axios.get(`${API_BASE_URL}/etudiant`),
+          axios.get(`${API_BASE_URL}/etudiant/stats`),
+        ]);
+        setStudents(studentsResponse.data);
+        setStats(statsResponse.data);
       } catch (err) {
         console.error("Failed to fetch students data:", err);
         setError("Impossible de charger les données des étudiants.");
-        // Fallback data
-        setStats({
-          totalStudents: 245,
-          maleCount: 135,
-          femaleCount: 110,
-          averageAge: 21.5,
-          yearDistribution: [
-            { year: "1ère année", count: 80 },
-            { year: "2ème année", count: 75 },
-            { year: "3ème année", count: 65 },
-            { year: "4ème année", count: 25 },
-          ],
-        });
+        setStudents([]);
+        setStats({});
       } finally {
         setLoading(false);
       }
@@ -393,7 +287,6 @@ const EnhancedStudentsComponent = () => {
     fetchStudentsData();
   }, []);
 
-  // Pass the fetched data to your component
   return (
     <StudentsComponent
       students={students}
@@ -415,39 +308,22 @@ const EnhancedProfesseurComponent = () => {
     const fetchProfessorData = async () => {
       try {
         setLoading(true);
-        // Call to ProfessorController
-        const professorsResponse = await axios.get(
-          `${API_BASE_URL}/professors`
-        );
-        setProfessors(professorsResponse.data);
-
-        // Call to ProfessorController for stats
-        const statsResponse = await axios.get(
-          `${API_BASE_URL}/professors/stats`
-        );
-        setStats(statsResponse.data);
-
         setError(null);
+        const [professorsResponse, statsResponse] = await Promise.all([
+          axios.get(`${API_BASE_URL}/professeur`),
+          axios.get(`${API_BASE_URL}/professeur/stats`),
+        ]);
+        setProfessors(professorsResponse.data);
+        setStats(statsResponse.data);
       } catch (err) {
         console.error("Failed to fetch professors data:", err);
         setError("Impossible de charger les données des professeurs.");
-        // Fallback data
-        setStats({
-          totalProfessors: 32,
-          departmentDistribution: [
-            { department: "Informatique", count: 8 },
-            { department: "Mathématiques", count: 7 },
-            { department: "Physique", count: 5 },
-            { department: "Langues", count: 6 },
-            { department: "Économie", count: 6 },
-          ],
-          averageExperience: 12.5,
-        });
+        setProfessors([]);
+        setStats({});
       } finally {
         setLoading(false);
       }
     };
-
     fetchProfessorData();
   }, []);
 
@@ -472,30 +348,18 @@ const EnhancedCoursesComponent = () => {
     const fetchCoursesData = async () => {
       try {
         setLoading(true);
-        // Call to CourseController
-        const coursesResponse = await axios.get(`${API_BASE_URL}/courses`);
-        setCourses(coursesResponse.data);
-
-        // Call to CourseController for stats
-        const statsResponse = await axios.get(`${API_BASE_URL}/courses/stats`);
-        setStats(statsResponse.data);
-
         setError(null);
+        const [coursesResponse, statsResponse] = await Promise.all([
+          axios.get(`${API_BASE_URL}/cours`),
+          axios.get(`${API_BASE_URL}/cours/stats`),
+        ]);
+        setCourses(coursesResponse.data);
+        setStats(statsResponse.data);
       } catch (err) {
         console.error("Failed to fetch courses data:", err);
         setError("Impossible de charger les données des cours.");
-        // Fallback data
-        setStats({
-          totalCourses: 58,
-          departmentDistribution: [
-            { department: "Informatique", count: 15 },
-            { department: "Mathématiques", count: 12 },
-            { department: "Physique", count: 10 },
-            { department: "Langues", count: 8 },
-            { department: "Économie", count: 13 },
-          ],
-          averageStudentsPerCourse: 35,
-        });
+        setCourses([]);
+        setStats({});
       } finally {
         setLoading(false);
       }
@@ -525,31 +389,18 @@ const EnhancedExamenComponent = () => {
     const fetchExamsData = async () => {
       try {
         setLoading(true);
-        // Call to ExamenController
-        const examsResponse = await axios.get(`${API_BASE_URL}/exams`);
-        setExams(examsResponse.data);
-
-        // Call to ExamenController for stats
-        const statsResponse = await axios.get(`${API_BASE_URL}/exams/stats`);
-        setStats(statsResponse.data);
-
         setError(null);
+        const [examsResponse, statsResponse] = await Promise.all([
+          axios.get(`${API_BASE_URL}/examens`),
+          axios.get(`${API_BASE_URL}/examens/stats`),
+        ]);
+        setExams(examsResponse.data);
+        setStats(statsResponse.data);
       } catch (err) {
         console.error("Failed to fetch exams data:", err);
         setError("Impossible de charger les données des examens.");
-        // Fallback data
-        setStats({
-          totalExams: 124,
-          upcomingExams: 18,
-          completedExams: 106,
-          averageScore: 14.5,
-          scoreDistribution: [
-            { range: "0-5", count: 8 },
-            { range: "6-10", count: 25 },
-            { range: "11-15", count: 55 },
-            { range: "16-20", count: 36 },
-          ],
-        });
+        setExams([]);
+        setStats({});
       } finally {
         setLoading(false);
       }
@@ -579,30 +430,18 @@ const EnhancedExerciseComponent = () => {
     const fetchExercisesData = async () => {
       try {
         setLoading(true);
-        // Call to ExerciseController
-        const exercisesResponse = await axios.get(`${API_BASE_URL}/exercises`);
-        setExercises(exercisesResponse.data);
-
-        // Call to ExerciseController for stats
-        const statsResponse = await axios.get(
-          `${API_BASE_URL}/exercises/stats`
-        );
-        setStats(statsResponse.data);
-
         setError(null);
+        const [exercisesResponse, statsResponse] = await Promise.all([
+          axios.get(`${API_BASE_URL}/exercices`),
+          axios.get(`${API_BASE_URL}/exercices/stats`),
+        ]);
+        setExercises(exercisesResponse.data);
+        setStats(statsResponse.data);
       } catch (err) {
         console.error("Failed to fetch exercises data:", err);
         setError("Impossible de charger les données des exercices.");
-        // Fallback data
-        setStats({
-          totalExercises: 367,
-          difficultiesDistribution: [
-            { difficulty: "Facile", count: 120 },
-            { difficulty: "Moyen", count: 157 },
-            { difficulty: "Difficile", count: 90 },
-          ],
-          completionRate: 68.5,
-        });
+        setExercises([]);
+        setStats({});
       } finally {
         setLoading(false);
       }
@@ -632,31 +471,18 @@ const EnhancedOuvragesComponent = () => {
     const fetchBooksData = async () => {
       try {
         setLoading(true);
-        // Call to BookController
-        const booksResponse = await axios.get(`${API_BASE_URL}/books`);
-        setBooks(booksResponse.data);
-
-        // Call to BookController for stats
-        const statsResponse = await axios.get(`${API_BASE_URL}/books/stats`);
-        setStats(statsResponse.data);
-
         setError(null);
+        const [booksResponse, statsResponse] = await Promise.all([
+          axios.get(`${API_BASE_URL}/ouvrages`),
+          axios.get(`${API_BASE_URL}/ouvrages/stats`),
+        ]);
+        setBooks(booksResponse.data);
+        setStats(statsResponse.data);
       } catch (err) {
         console.error("Failed to fetch books data:", err);
         setError("Impossible de charger les données des ouvrages.");
-        // Fallback data
-        setStats({
-          totalBooks: 89,
-          categoryDistribution: [
-            { category: "Informatique", count: 28 },
-            { category: "Mathématiques", count: 22 },
-            { category: "Physique", count: 15 },
-            { category: "Langues", count: 12 },
-            { category: "Économie", count: 12 },
-          ],
-          availableBooks: 65,
-          borrowedBooks: 24,
-        });
+        setBooks([]);
+        setStats({});
       } finally {
         setLoading(false);
       }
@@ -686,28 +512,21 @@ const EnhancedRapportsPage = () => {
     const fetchReportsData = async () => {
       try {
         setLoading(true);
-        // Call to ReportController
-        const reportsResponse = await axios.get(`${API_BASE_URL}/reports`);
-        setReports(reportsResponse.data);
-
-        // Call to ReportController for stats
-        const statsResponse = await axios.get(`${API_BASE_URL}/reports/stats`);
-        setStats(statsResponse.data);
-
         setError(null);
+
+        // Fetch all reports and stats in parallel
+        const [reportsResponse, statsResponse] = await Promise.all([
+          axios.get(`${API_BASE_URL}/report`), // Changed from /report/AllReports
+          axios.get(`${API_BASE_URL}/report/stats`),
+        ]);
+
+        setReports(reportsResponse.data);
+        setStats(statsResponse.data);
       } catch (err) {
         console.error("Failed to fetch reports data:", err);
         setError("Impossible de charger les données des rapports.");
-        // Fallback data
-        setStats({
-          totalReports: 75,
-          categoryDistribution: [
-            { category: "Académique", count: 35 },
-            { category: "Financier", count: 15 },
-            { category: "Administratif", count: 25 },
-          ],
-          recentReports: 12,
-        });
+        setReports([]);
+        setStats({});
       } finally {
         setLoading(false);
       }
@@ -736,23 +555,14 @@ const EnhancedProfilePage = () => {
     const fetchProfileData = async () => {
       try {
         setLoading(true);
-        // Call to AdminController
-        const profileResponse = await axios.get(
-          `${API_BASE_URL}/admin/profile`
-        );
-        setProfile(profileResponse.data);
         setError(null);
+
+        const profileResponse = await axios.get(`${API_BASE_URL}/chef/profile`);
+        setProfile(profileResponse.data);
       } catch (err) {
         console.error("Failed to fetch profile data:", err);
         setError("Impossible de charger les données du profil.");
-        // Fallback data
-        setProfile({
-          id: 1,
-          name: "Admin User",
-          email: "admin@example.com",
-          role: "Administrateur",
-          lastLogin: "2025-05-04T15:30:00Z",
-        });
+        setProfile(null);
       } finally {
         setLoading(false);
       }

@@ -119,7 +119,7 @@ const RegistrationForm = () => {
   const determineRedirectPath = (role) => {
     // Direct the user based on their role
     switch (role) {
-      case "admin":
+      case "chef_departement":
         return "/AdminDashboard";
       case "professeur":
         return "/ProfDashboard";

@@ -22,6 +22,7 @@ const ProfilePage = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState({
@@ -44,10 +45,38 @@ const ProfilePage = () => {
     confirmPassword: "",
   });
 
-  const API_URL = "http://localhost:8084/api/chef/681755f97a1d6d3dcaa7f204";
+  // Get user info from localStorage once at the beginning
+  const getUserFromLocalStorage = () => {
+    const userString = localStorage.getItem("user");
+    if (!userString) {
+      return null;
+    }
+    return JSON.parse(userString);
+  };
 
+  const userInfo = getUserFromLocalStorage();
+
+  // If we can't get the user info, we should redirect or show an error
+  useEffect(() => {
+    if (!userInfo) {
+      setError("Information utilisateur non trouvée");
+      setLoading(false);
+      return;
+    }
+  }, []);
+
+  const API_URL = userInfo
+    ? `http://localhost:8084/api/chef/${userInfo.id}`
+    : "";
+
+  // Fetch user data
   useEffect(() => {
     const fetchData = async () => {
+      if (!API_URL) {
+        setLoading(false);
+        return;
+      }
+
       try {
         const response = await axios.get(API_URL);
         setUserData(response.data);
@@ -58,8 +87,9 @@ const ProfilePage = () => {
         setLoading(false);
       }
     };
+
     fetchData();
-  }, []);
+  }, [API_URL]);
 
   const handlePasswordUpdate = async () => {
     const { newPassword, confirmPassword } = passwordData;
@@ -77,18 +107,28 @@ const ProfilePage = () => {
 
     try {
       setIsSaving(true);
+      setPasswordError("");
 
-      // Merge password with existing user data
-      const updateData = {
-        ...userData,
-        motDePasse: newPassword,
+      if (!userInfo || !userInfo.id) {
+        setPasswordError("Information utilisateur non trouvée");
+        return;
+      }
+
+      // Use the specific password change endpoint
+      const passwordChangeUrl = `http://localhost:8084/api/chef/${userInfo.id}/change-password`;
+
+      // Send only the password data to the password-specific endpoint
+      const passwordPayload = {
+        newPassword,
+        confirmPassword,
       };
 
-      const response = await axios.put(API_URL, updateData);
+      // Make API call
+      const response = await axios.put(passwordChangeUrl, passwordPayload);
 
-      setUserData(response.data);
+      // Show success message
+      setSuccessMessage("Mot de passe mis à jour avec succès");
       resetPasswordForm();
-      setPasswordError("");
     } catch (err) {
       setPasswordError(
         err.response?.data?.message ||
@@ -115,6 +155,7 @@ const ProfilePage = () => {
       const response = await axios.put(API_URL, editedData);
       setUserData(response.data);
       setIsEditing(false);
+      setSuccessMessage("Profil mis à jour avec succès");
     } catch (err) {
       setError(err.response?.data?.message || err.message);
     } finally {
@@ -144,7 +185,8 @@ const ProfilePage = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    window.location.href = "/login"; // Or use your router to navigate
+    localStorage.removeItem("user");
+    window.location.href = "/register"; // Or use your router to navigate
   };
 
   if (loading)
