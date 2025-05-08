@@ -4,7 +4,6 @@ import {
   FiUser,
   FiMail,
   FiPhone,
-  FiCalendar,
   FiBook,
   FiBarChart,
   FiEdit,
@@ -16,7 +15,8 @@ import {
   FiTrendingUp,
   FiClock,
   FiBookmark,
-  FiShield
+  FiShield,
+  FiLogOut,
 } from "react-icons/fi";
 import defaultAvatar from "../../Products/imgs/pexels-photo-771742.jpeg";
 
@@ -34,6 +34,13 @@ const StudentProfile = () => {
     fetchStudentData();
     fetchStudentStats();
   }, []);
+
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    // Optional: You might want to clear other user-related state here
+    window.location.href = "/register"; // Redirect to register page as requested
+  };
 
   const fetchStudentData = async () => {
     try {
@@ -192,29 +199,39 @@ const StudentProfile = () => {
               </div>
             </div>
 
-            {!editing ? (
-              <button
-                onClick={() => setEditing(true)}
-                className="mt-4 md:mt-0 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all flex items-center"
-              >
-                <FiEdit className="mr-2" /> Modifier Profil
-              </button>
-            ) : (
-              <div className="flex gap-2 mt-4 md:mt-0">
-                <button
-                  onClick={handleSubmit}
-                  className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all flex items-center"
-                >
-                  <FiSave className="mr-2" /> Enregistrer
-                </button>
-                <button
-                  onClick={cancelEdit}
-                  className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all flex items-center"
-                >
-                  <FiX className="mr-2" /> Annuler
-                </button>
-              </div>
-            )}
+            <div className="flex flex-col md:flex-row gap-4 mt-4 md:mt-0">
+              {!editing ? (
+                <>
+                  <button
+                    onClick={() => setEditing(true)}
+                    className="mt-4 md:mt-0 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all flex items-center"
+                  >
+                    <FiEdit className="mr-2" /> Modifier Profil
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all flex items-center"
+                  >
+                    <FiLogOut className="mr-2" /> Déconnexion
+                  </button>
+                </>
+              ) : (
+                <div className="flex gap-2 mt-4 md:mt-0">
+                  <button
+                    onClick={handleSubmit}
+                    className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all flex items-center"
+                  >
+                    <FiSave className="mr-2" /> Enregistrer
+                  </button>
+                  <button
+                    onClick={cancelEdit}
+                    className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all flex items-center"
+                  >
+                    <FiX className="mr-2" /> Annuler
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Navigation Tabs */}
@@ -457,7 +474,7 @@ const StudentProfile = () => {
                           } à l'ENSA Khouribga, passionné${
                             student.genre === "F" ? "e" : ""
                           } par les technologies innovantes et le développement de solutions numériques. Actuellement en ${
-                            student.niveau 
+                            student.niveau
                           }, je me spécialise dans les domaines de l'informatique tout en participant activement à la vie étudiante.`}
                       </p>
                     </div>

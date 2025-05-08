@@ -72,7 +72,7 @@ const Navbar = () => {
   const handleProfileAction = () => {
     if (user) {
       // If user is logged in, navigate to profile
-      window.location.href = "/profile";
+      window.location.href = "/StudentProfile";
     } else {
       // If not logged in, navigate to login page
       window.location.href = "/register";
@@ -234,9 +234,7 @@ const Navbar = () => {
                         className="h-8 w-8 rounded-full object-cover relative z-10 border border-gray-700"
                       />
                     </div>
-                    <span className="ml-2">
-                      {user.nom}
-                    </span>
+                    <span className="ml-2">{user.username}</span>
                   </div>
                 ) : (
                   // User is not authenticated - show connection button
@@ -248,34 +246,6 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
-
-              {/* User dropdown menu - only show when authenticated and hovered */}
-              {user && hoveredMenuItem === "profile" && (
-                <div className="absolute top-full right-0 bg-gray-800 border border-white/10 rounded-lg mt-1 py-2 w-56 shadow-lg shadow-purple-500/10 backdrop-blur-lg">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-lg" />
-                  <a
-                    href="/profile"
-                    className="flex items-center px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700/50 relative"
-                  >
-                    <span className="mr-2 text-blue-400">
-                      <FiUser />
-                    </span>
-                    <span>Mon profil</span>
-                  </a>
-                  <div
-                    className="flex items-center px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700/50 relative cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent triggering parent onClick
-                      handleLogout();
-                    }}
-                  >
-                    <span className="mr-2 text-blue-400">
-                      <FiLogOut />
-                    </span>
-                    <span>Déconnexion</span>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
