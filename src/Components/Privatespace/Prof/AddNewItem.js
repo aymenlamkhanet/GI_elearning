@@ -1,30 +1,34 @@
 import React, { useState } from "react";
+import axios from "axios";
 import {
   BookOpen,
-  FileText,
   ClipboardList,
   PlusCircle,
   Calendar,
   Check,
   Upload,
   X,
-  Film,
-  Link,
   FileSpreadsheet,
 } from "lucide-react";
 
 const AddNewItem = () => {
   const [selectedType, setSelectedType] = useState("cours");
   const [formData, setFormData] = useState({
-    title: "",
+    titre: "",
     description: "",
     date: "",
-    class: "",
-    files: [],
+    module: "",
+    niveau: "",
+    ratingAvg: 0,
+    fichier: null,
     links: [],
+    duree: "",
   });
   const [link, setLink] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -32,6 +36,11 @@ const AddNewItem = () => {
       ...formData,
       [name]: value,
     });
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFormData({ ...formData, fichier: file });
   };
 
   const handleAddLink = () => {
@@ -51,25 +60,53 @@ const AddNewItem = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  // Get token from localStorage
+  const getAuthToken = () => {
+    return localStorage.getItem("token");
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", { type: selectedType, ...formData });
+    setIsSubmitting(true);
+    setShowError(false);
 
-    // Show success message
-    setShowSuccess(true);
+    const formDataToSend = new FormData();
+    // Append all fields
+    formDataToSend.append("titre", formData.titre);
+    formDataToSend.append("description", formData.description);
+    formDataToSend.append("date", formData.date + "T00:00:00");
+    formDataToSend.append("module", formData.module);
+    formDataToSend.append("niveau", formData.niveau);
+    formDataToSend.append("ratingAvg", formData.ratingAvg);
 
-    // Reset form after short delay
-    setTimeout(() => {
-      setFormData({
-        title: "",
-        description: "",
-        date: "",
-        class: "",
-        files: [],
-        links: [],
-      });
-      setShowSuccess(false);
-    }, 3000);
+    if (selectedType === "cours") {
+      formDataToSend.append("duree", formData.duree);
+      formDataToSend.append("links", JSON.stringify(formData.links));
+    }
+
+    if (formData.fichier) {
+      formDataToSend.append("file", formData.fichier); // Use "file" if backend expects it
+    }
+
+    // DEBUG: Log FormData contents
+    console.log("--- FormData Contents ---");
+    for (let [key, value] of formDataToSend.entries()) {
+      console.log(key, value);
+    }
+
+    try {
+      const response = await axios.post(
+        `http://localhost:8084/api/${selectedType}s/ajouter`,
+        formDataToSend
+      );
+      setShowSuccess(true);
+    } catch (error) {
+      console.error("Backend error:", error.response?.data);
+      setErrorMessage(error.response?.data?.message || "Request failed");
+      setShowError(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -105,6 +142,13 @@ const AddNewItem = () => {
         <div className="mb-6 bg-green-900/30 border border-green-500/30 text-green-400 p-4 rounded-lg flex items-center animate-fade-in">
           <Check className="w-5 h-5 mr-2" />
           Votre élément a été créé avec succès!
+        </div>
+      )}
+
+      {showError && (
+        <div className="mb-6 bg-red-900/30 border border-red-500/30 text-red-400 p-4 rounded-lg flex items-center animate-fade-in">
+          <X className="w-5 h-5 mr-2" />
+          {errorMessage}
         </div>
       )}
 
@@ -165,14 +209,32 @@ const AddNewItem = () => {
                 Titre*
               </label>
               <input
-                id="title"
-                name="title"
+                id="titre"
+                name="titre"
+                value={formData.titre}
+                onChange={handleInputChange}
                 type="text"
                 required
-                value={formData.title}
-                onChange={handleInputChange}
                 className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg focus:border-purple-400 focus:ring-1 focus:ring-purple-400 transition-all"
                 placeholder={`Titre du ${selectedType}`}
+              />
+            </div>
+
+            <div>
+              <label
+                className="block text-sm text-gray-400 mb-1"
+                htmlFor="module"
+              >
+                Module*
+              </label>
+              <input
+                id="module"
+                name="module"
+                value={formData.module}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg focus:border-purple-400 focus:ring-1 focus:ring-purple-400 transition-all"
+                placeholder="Entrez le module"
+                required
               />
             </div>
 
@@ -218,101 +280,137 @@ const AddNewItem = () => {
                   />
                 </div>
               </div>
+            </div>
 
+            <div>
+              <label
+                className="block text-sm text-gray-400 mb-1"
+                htmlFor="niveau"
+              >
+                Niveau*
+              </label>
+              <select
+                id="niveau"
+                required
+                name="niveau"
+                value={formData.niveau}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg focus:border-purple-400 focus:ring-1 focus:ring-purple-400 transition-all"
+              >
+                <option value="">Sélectionnez un niveau</option>
+                <option value="GI1">GI1</option>
+                <option value="GI2">GI2</option>
+                <option value="GI3">GI3</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                className="block text-sm text-gray-400 mb-1"
+                htmlFor="ratingAvg"
+              >
+                Note moyenne
+              </label>
+              <input
+                type="number"
+                id="ratingAvg"
+                name="ratingAvg"
+                value={formData.ratingAvg}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg focus:border-purple-400 focus:ring-1 focus:ring-purple-400 transition-all"
+                min="0"
+                max="5"
+                step="0.1"
+              />
+            </div>
+
+            {selectedType === "cours" && (
               <div>
                 <label
                   className="block text-sm text-gray-400 mb-1"
-                  htmlFor="class"
+                  htmlFor="duree"
                 >
-                  Classe*
+                  Durée*
                 </label>
-                <select
-                  id="class"
-                  name="class"
-                  required
-                  value={formData.class}
+                <input
+                  id="duree"
+                  name="duree"
+                  value={formData.duree}
                   onChange={handleInputChange}
+                  required
                   className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg focus:border-purple-400 focus:ring-1 focus:ring-purple-400 transition-all"
-                >
-                  <option value="">Sélectionnez une classe</option>
-                  <option value="biologie-avancee">
-                    Biologie Avancée - Terminale S
-                  </option>
-                  <option value="sciences-vie">
-                    Sciences de la Vie - Seconde
-                  </option>
-                  <option value="ecologie">
-                    Écologie et Environnement - Première ES
-                  </option>
-                </select>
+                  placeholder="Durée du cours (ex: 1h30)"
+                />
               </div>
-            </div>
+            )}
 
             <div>
               <label className="block text-sm text-gray-400 mb-1">
-                Fichiers
+                Fichier
               </label>
               <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-purple-400 transition-colors cursor-pointer">
-                <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                <p>Glissez-déposez des fichiers ici ou</p>
-                <button
-                  type="button"
-                  className="mt-2 px-4 py-2 bg-purple-600/30 text-purple-300 rounded-lg hover:bg-purple-600/40 transition-colors"
-                >
-                  Parcourir
-                </button>
-                <input type="file" className="hidden" />
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="fileInput"
+                />
+                <label htmlFor="fileInput" className="cursor-pointer">
+                  <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                  <p>Glissez-déposez un fichier ici ou</p>
+                </label>
+                {formData.fichier && (
+                  <p className="mt-2 text-sm text-gray-300">
+                    Fichier sélectionné: {formData.fichier.name}
+                  </p>
+                )}
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">Liens</label>
-              <div className="flex space-x-2">
-                <div className="relative flex-1">
-                  <Link
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    size={18}
-                  />
+            {selectedType === "cours" && (
+              <div>
+                <label
+                  className="block text-sm text-gray-400 mb-1"
+                  htmlFor="link"
+                >
+                  Ajouter un lien
+                </label>
+                <div className="flex gap-2">
                   <input
+                    id="link"
                     type="url"
                     value={link}
                     onChange={(e) => setLink(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg focus:border-purple-400 focus:ring-1 focus:ring-purple-400 transition-all"
-                    placeholder="Ajouter un lien (vidéo, ressource, etc.)"
+                    className="flex-1 px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg"
+                    placeholder="https://exemple.com"
                   />
+                  <button
+                    type="button"
+                    onClick={handleAddLink}
+                    className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+                  >
+                    Ajouter
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleAddLink}
-                  className="px-4 py-2 bg-purple-600/30 text-purple-300 rounded-lg hover:bg-purple-600/40 transition-colors"
-                >
-                  <PlusCircle className="w-5 h-5" />
-                </button>
-              </div>
-
-              {formData.links.length > 0 && (
-                <div className="mt-2 space-y-2">
-                  {formData.links.map((url, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-2 bg-gray-700/30 rounded-lg"
+                <ul className="mt-2 text-sm text-gray-300 space-y-1">
+                  {formData.links.map((l, idx) => (
+                    <li
+                      key={idx}
+                      className="flex items-center justify-between bg-gray-700/40 p-2 rounded-md"
                     >
-                      <div className="flex items-center">
-                        <Film className="w-4 h-4 mr-2 text-purple-400" />
-                        <span className="text-sm truncate">{url}</span>
-                      </div>
+                      <span className="break-all">{l}</span>
                       <button
                         type="button"
-                        onClick={() => handleRemoveLink(url)}
-                        className="text-gray-400 hover:text-red-400"
+                        onClick={() => handleRemoveLink(l)}
+                        className="text-red-400 hover:text-red-600"
                       >
-                        <X className="w-5 h-5" />
+                        <X size={16} />
                       </button>
-                    </div>
+                    </li>
                   ))}
-                </div>
-              )}
-            </div>
+                </ul>
+              </div>
+            )}
 
             <div className="flex justify-end space-x-2">
               <button
@@ -323,11 +421,18 @@ const AddNewItem = () => {
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-colors"
+                disabled={isSubmitting}
+                className="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-colors disabled:opacity-50"
               >
                 <div className="flex items-center">
-                  <PlusCircle className="w-5 h-5 mr-2" />
-                  Créer
+                  {isSubmitting ? (
+                    "Création en cours..."
+                  ) : (
+                    <>
+                      <PlusCircle className="w-5 h-5 mr-2" />
+                      Créer
+                    </>
+                  )}
                 </div>
               </button>
             </div>

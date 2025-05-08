@@ -18,6 +18,7 @@ import ProfDashboard from "./Components/Privatespace/Prof/ProfDashboard";
 import QuestionsForum from "./Components/Discussion/QuestionsForum";
 import GI2CourseDashboard from "./Components/Cours&Exos/GI2CourseDashboard";
 import GI3CourseDashboard from "./Components/Cours&Exos/GI3CourseDashboard";
+import StudentProfile from "./Components/Privatespace/Students/StudentProfile";
 import axios from "axios";
 import ExerciseDashboard from "./Components/Dashboard/ExerciseDashboard";
 
@@ -41,7 +42,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
-        <Route path="/ExosDashboard" element={<ExerciseDashboard/>}/>
+        <Route path="/ExosDashboard" element={<ExerciseDashboard />} />
         <Route path="/ProfDashboard" element={<ProfDashboard />} />
         <Route path="/Forum" element={<QuestionsForum />} />
         <Route path="/algos" element={<AlgorithmsPage />} />
@@ -53,6 +54,7 @@ const App = () => {
         <Route path="/BiblioFiches" element={<BiblioFichesPage />} />
         <Route path="/Biblio-Concours" element={<ConcoursPage />} />
         <Route path="/About" element={<AboutPage />} />
+        <Route path="/StudentProfile" element={<StudentProfile />} />
         <Route path="/Partenaires" element={<Partenaires />} />
         <Route path="/team" element={<TeamMembers />} />
         <Route path="/biblio_ouvrages" element={<BooksCollectionDisplay />} />

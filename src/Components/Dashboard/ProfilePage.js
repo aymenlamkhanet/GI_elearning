@@ -65,9 +65,7 @@ const ProfilePage = () => {
     }
   }, []);
 
-  const API_URL = userInfo
-    ? `http://localhost:8084/api/chef/${userInfo.id}`
-    : "";
+  const API_URL = `http://localhost:8084/api/chef/${userInfo.id}`;
 
   // Fetch user data
   useEffect(() => {

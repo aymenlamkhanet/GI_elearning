@@ -91,6 +91,8 @@ const AjoutCours = ({ isOpen, onClose }) => {
       setIsSubmitting(false);
     }
   };
+
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
       <div className="bg-[#111827] text-white rounded-xl shadow-lg max-w-[600px] w-full mx-4 border border-white/10">

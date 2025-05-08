@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import ProfessorProfile from "./ProfileComponent";
-import HistoryComponent from "./HistoryComponent";
-import { User, Menu, X, PlusSquare, History } from "lucide-react";
+import { User, Menu, X, PlusSquare } from "lucide-react";
 import AddNewItem from "./AddNewItem";
 
 const ProfDashboard = () => {
@@ -21,12 +20,6 @@ const ProfDashboard = () => {
         return (
           <AddNewItem/>
         );
-
-      case "history":
-        return (
-          <HistoryComponent/>
-        );
-
       default:
         return null;
     }
@@ -57,7 +50,7 @@ const ProfDashboard = () => {
               {[
                 { section: "profile", icon: User, label: "Profil" },
                 { section: "addNew", icon: PlusSquare, label: "Ajouter" },
-                { section: "history", icon: History, label: "Historique" },
+                
               ].map(({ section, icon: Icon, label }) => (
                 <button
                   key={section}
