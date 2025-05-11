@@ -3,8 +3,8 @@ pipeline {
     environment {
         NODE_VERSION = 'v23.7.0'
         DOCKER_IMAGE = "my-app:${env.BUILD_ID}"
-        // Define SonarQube authentication token as a credential
-        SONAR_TOKEN = credentials('sonarqube-token')
+        // Define SonarQube credentials differently
+        SONAR_CREDS = credentials('sonarqube-token')
     }
     tools {
         nodejs 'NodeJS 23.7.0'
@@ -34,7 +34,6 @@ pipeline {
                     -Dsonar.projectKey=SonarQube_TP1 \\
                     -Dsonar.projectName='SonarQube_TP1' \\
                     -Dsonar.host.url=http://172.17.0.2:9000 \\
-                    -Dsonar.login=${SONAR_TOKEN} \\
                     -Dsonar.sources=src \\
                     -Dsonar.language=js \\
                     -Dsonar.sourceEncoding=UTF-8
@@ -66,8 +65,13 @@ pipeline {
     
     post {
         always {
-            echo 'Cleaning up workspace...'
-            cleanWs()
+            script {
+                // Ensure we're in a node context for cleanWs
+                node {
+                    echo 'Cleaning up workspace...'
+                    cleanWs()
+                }
+            }
         }
     }
 }
