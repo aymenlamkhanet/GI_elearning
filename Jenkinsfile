@@ -3,11 +3,10 @@ pipeline {
     environment {
         NODE_VERSION = 'v23.7.0'  // Optional, but ensure it's consistent if used elsewhere
         DOCKER_IMAGE = "my-app:${env.BUILD_ID}"
+        SONAR_SCANNER_HOME = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
     }
     tools {
         nodejs 'NodeJS 23.7.0'
-        // Fix for SonarQube tool declaration
-        'hudson.plugins.sonar.SonarRunnerInstallation' 'SonarQubeScanner'
     }
     stages {
         stage('Clone Repository') {
@@ -28,16 +27,17 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('Sonarqube') { // Must match EXACTLY your server name
-                    sh """
-                    ${tool('SonarQubeScanner')}/bin/sonar-scanner \\
+                    // Install sonar-scanner with npm if needed
+                    sh '''
+                    npm install -g sonar-scanner
+                    sonar-scanner \\
                     -Dsonar.projectKey=SonarQube_TP1 \\
                     -Dsonar.projectName='SonarQube_TP1' \\
                     -Dsonar.host.url=http://172.17.0.2:9000 \\
-                    -Dsonar.login=${env.sonartoken} \\
                     -Dsonar.sources=src \\
                     -Dsonar.language=js \\
                     -Dsonar.sourceEncoding=UTF-8
-                    """
+                    '''
                 }
             }
         }
