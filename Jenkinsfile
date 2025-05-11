@@ -5,6 +5,8 @@ pipeline {
         NODE_VERSION = 'v23.7.0'
         DOCKER_IMAGE = "my-app:${env.BUILD_ID}"
         SONAR_PROJECT_KEY = "SonarQube_TP1"
+        // Define credential for direct access
+        SONAR_CREDS = credentials('sonar_token')
     }
     
     tools {
@@ -34,30 +36,33 @@ pipeline {
             }
         }
         
+        stage('Create SonarQube Project') {
+            steps {
+                // Create the project first using API call with direct token
+                sh '''
+                    TOKEN=$(echo ${SONAR_CREDS} | cut -d':' -f2)
+                    curl -u "${TOKEN}:" -X POST "http://172.17.0.2:9000/api/projects/create" \
+                    -d "name=SonarQube_TP1" \
+                    -d "project=SonarQube_TP1" || true
+                '''
+            }
+        }
+        
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv(installationName: 'Sonarqube', credentialsId: 'sonar_token') {
-                    // First ensure the project exists
-                    sh '''
-                        # We'll check if the project exists in SonarQube
-                        curl -u "${SONAR_AUTH_TOKEN}:" -X POST "http://172.17.0.2:9000/api/projects/create" \
-                          -d "name=${SONAR_PROJECT_KEY}" \
-                          -d "project=${SONAR_PROJECT_KEY}" || echo "Project may already exist"
-                    '''
-                    
-                    // Then run the scan with proper permissions
-                    sh '''
-                        sonar-scanner \
-                        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                        -Dsonar.projectName=${SONAR_PROJECT_KEY} \
-                        -Dsonar.host.url=http://172.17.0.2:9000 \
-                        -Dsonar.login=${SONAR_AUTH_TOKEN} \
-                        -Dsonar.sources=. \
-                        -Dsonar.exclusions=node_modules/**,coverage/**,dist/**,test/**,**/*.test.js \
-                        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-                        -Dsonar.sourceEncoding=UTF-8
-                    '''
-                }
+                // Use token directly in scanner configuration
+                sh '''
+                    TOKEN=$(echo ${SONAR_CREDS} | cut -d':' -f2)
+                    /var/jenkins_home/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/NodeJS_23.7.0/lib/node_modules/sonar-scanner/bin/sonar-scanner \
+                    -Dsonar.projectKey=SonarQube_TP1 \
+                    -Dsonar.projectName=SonarQube_TP1 \
+                    -Dsonar.host.url=http://172.17.0.2:9000 \
+                    -Dsonar.login=${TOKEN} \
+                    -Dsonar.sources=. \
+                    -Dsonar.exclusions=node_modules/**,coverage/**,dist/**,test/**,**/*.test.js \
+                    -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+                    -Dsonar.sourceEncoding=UTF-8
+                '''
             }
         }
         
