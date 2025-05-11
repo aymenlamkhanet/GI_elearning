@@ -19,7 +19,7 @@ pipeline {
         
         stage('Install Dependencies') {
             steps {
-                echo 'Installing dependencies......'
+                echo 'Installing dependencies...'
                 sh 'npm --version'
                 sh 'npm install'
             }
@@ -28,7 +28,6 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('Sonarqube') {
-                    // Use Jenkins credential for authentication
                     sh '''
                     npm install -g sonar-scanner
                     sonar-scanner \\
@@ -58,9 +57,6 @@ pipeline {
                     args '-e DOCKER_HOST=tcp://host.docker.internal:2375'
                 }
             }
-            environment {
-                DOCKER_CONFIG = "$HOME/.docker"
-            }
             steps {
                 echo 'Building Docker Image...'
                 sh "docker build -t ${DOCKER_IMAGE} ."
@@ -69,21 +65,9 @@ pipeline {
     }
     
     post {
-        success {
-            node(null) {
-                echo 'Pipeline succeeded! 🎉'
-            }
-        }
-        failure {
-            node(null) {
-                echo 'Pipeline failed! ❌'
-            }
-        }
         always {
-            node(null) {
-                echo 'Cleaning up workspace...'
-                cleanWs()
-            }
+            echo 'Cleaning up workspace...'
+            cleanWs()
         }
     }
 }
