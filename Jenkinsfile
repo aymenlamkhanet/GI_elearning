@@ -1,11 +1,13 @@
 pipeline {
     agent any
     environment {
-        NODE_VERSION = 'v23.7.0'  // Optional, but ensure it's consistent if used elsewhere
+        NODE_VERSION = 'v23.7.0'
         DOCKER_IMAGE = "my-app:${env.BUILD_ID}"
+        SONARQUBE_SCANNER = tool 'SonarQubeScanner' // Requires SonarQube Scanner plugin
     }
     tools {
-        nodejs 'NodeJS 23.7.0' // Corrected tool name to match Jenkins configuration
+        nodejs 'NodeJS 23.7.0'
+        // Ensure SonarQubeScanner is configured in Jenkins Global Tools
     }
     stages {
         stage('Clone Repository') {
@@ -17,7 +19,7 @@ pipeline {
         
         stage('Install Dependencies') {
             steps {
-                echo 'Installing dependencies......'
+                echo 'Installing dependencies...'
                 sh 'npm --version'
                 sh 'npm install'
             }
@@ -30,21 +32,37 @@ pipeline {
             }
         }
         
-        stage('Build Docker Image') {
-    agent {
-        docker {
-            image 'docker:latest'
-            args '-e DOCKER_HOST=tcp://host.docker.internal:2375'  // Use TCP instead of socket
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') { // Configured in Jenkins System Settings
+                    sh """
+                    ${SONARQUBE_SCANNER}/bin/sonar-scanner \
+                    -Dsonar.projectKey=GI_elearning-frontend \
+                    -Dsonar.projectName=GI_elearning-frontend \
+                    -Dsonar.sources=src \
+                    -Dsonar.language=js \
+                    -Dsonar.sourceEncoding=UTF-8 \
+                    -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+                    """
+                }
+            }
         }
-    }
-    environment {
-        DOCKER_CONFIG = "$HOME/.docker"  // Still needed for config files
-    }
-    steps {
-        echo 'Building Docker Image...'
-        sh "docker build -t ${DOCKER_IMAGE} ."
-    }
-}
+        
+        stage('Build Docker Image') {
+            agent {
+                docker {
+                    image 'docker:latest'
+                    args '-e DOCKER_HOST=tcp://host.docker.internal:2375'
+                }
+            }
+            environment {
+                DOCKER_CONFIG = "$HOME/.docker"
+            }
+            steps {
+                echo 'Building Docker Image...'
+                sh "docker build -t ${DOCKER_IMAGE} ."
+            }
+        }
     }
     
     post {
