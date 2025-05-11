@@ -6,7 +6,7 @@ pipeline {
     }
     tools {
         nodejs 'NodeJS 23.7.0'
-        sonarqubeScanner 'SonarQubeScanner'
+        sonarRunner 'SonarQubeScanner'
     }
     stages {
         stage('Clone Repository') {
@@ -31,23 +31,20 @@ pipeline {
             }
         }
         
+        
         stage('SonarQube Analysis') {
             steps {
-                script {
-                    withSonarQubeEnv('Sonarqube') { 
-                        // Add these parameters matching your CLI command
-                        sh """
-                        ${tool('SonarQubeScanner')}/bin/sonar-scanner \
-                        -Dsonar.projectKey=SonarQube_TP1 \
-                        -Dsonar.projectName='SonarQube_TP1' \
-                        -Dsonar.host.url=http://localhost:9000 \
-                        -Dsonar.login=sqp_5cdaac7624158c228aa310246a04431a3d635373 \
-                        -Dsonar.sources=src \
-                        -Dsonar.language=js \
-                        -Dsonar.sourceEncoding=UTF-8 \
-                        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-                        """
-                    }
+                withSonarQubeEnv('Sonarqube') { // Must match EXACTLY your server name
+                    sh """
+                    ${tool('SonarQubeScanner')}/bin/sonar-scanner \
+                    -Dsonar.projectKey=SonarQube_TP1 \
+                    -Dsonar.projectName='SonarQube_TP1' \
+                    -Dsonar.host.url=http://172.17.0.2:9000 \
+                    -Dsonar.login=${sonartoken} \ // Use credential ID from Jenkins
+                    -Dsonar.sources=src \
+                    -Dsonar.language=js \
+                    -Dsonar.sourceEncoding=UTF-8
+                    """
                 }
             }
         }
