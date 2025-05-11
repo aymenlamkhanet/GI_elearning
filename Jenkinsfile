@@ -3,11 +3,10 @@ pipeline {
     environment {
         NODE_VERSION = 'v23.7.0'
         DOCKER_IMAGE = "my-app:${env.BUILD_ID}"
-        SONARQUBE_SCANNER = tool 'SonarQubeScanner' // Requires SonarQube Scanner plugin
     }
     tools {
         nodejs 'NodeJS 23.7.0'
-        // Ensure SonarQubeScanner is configured in Jenkins Global Tools
+        sonarqubeScanner 'SonarQubeScanner'
     }
     stages {
         stage('Clone Repository') {
@@ -34,16 +33,21 @@ pipeline {
         
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') { // Configured in Jenkins System Settings
-                    sh """
-                    ${SONARQUBE_SCANNER}/bin/sonar-scanner \
-                    -Dsonar.projectKey=GI_elearning-frontend \
-                    -Dsonar.projectName=GI_elearning-frontend \
-                    -Dsonar.sources=src \
-                    -Dsonar.language=js \
-                    -Dsonar.sourceEncoding=UTF-8 \
-                    -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-                    """
+                script {
+                    withSonarQubeEnv('Sonarqube') { 
+                        // Add these parameters matching your CLI command
+                        sh """
+                        ${tool('SonarQubeScanner')}/bin/sonar-scanner \
+                        -Dsonar.projectKey=SonarQube_TP1 \
+                        -Dsonar.projectName='SonarQube_TP1' \
+                        -Dsonar.host.url=http://localhost:9000 \
+                        -Dsonar.login=sqp_5cdaac7624158c228aa310246a04431a3d635373 \
+                        -Dsonar.sources=src \
+                        -Dsonar.language=js \
+                        -Dsonar.sourceEncoding=UTF-8 \
+                        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+                        """
+                    }
                 }
             }
         }
