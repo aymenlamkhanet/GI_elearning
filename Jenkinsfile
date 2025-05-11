@@ -56,8 +56,8 @@ pipeline {
                     sh '''
                         sonar-scanner -X \
                         -Dsonar.host.url=http://172.17.0.2:9000 \
-                        -Dsonar.projectKey=SonarQube_TP1 \
-                        -Dsonar.projectName='SonarQube_TP1' \
+                        -Dsonar.projectKey=SonarQube_GI \
+                        -Dsonar.projectName='SonarQube_GI' \
                         -Dsonar.sources=. \
                         -Dsonar.exclusions=node_modules/**,coverage/**,dist/**,test/**,**/*.test.js \
                         -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
