@@ -4,7 +4,7 @@ pipeline {
     environment {
         NODE_VERSION = 'v23.7.0'
         DOCKER_IMAGE = "my-app:${env.BUILD_ID}"
-        // Don't use credentials binding here as we'll use withCredentials block
+        // Using withSonarQubeEnv instead of credentials binding
     }
     
     tools {
@@ -26,7 +26,7 @@ pipeline {
                 sh 'npm install'
             }
         }
-
+        
         stage('Run Tests') {
             steps {
                 echo 'Running tests...'
@@ -36,23 +36,19 @@ pipeline {
         
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('Sonarqube') {
+                withSonarQubeEnv(installationName: 'Sonarqube', credentialsId: 'sonartoken') {
                     sh '''
-                    # Check network connectivity to SonarQube
-                    echo "Testing connection to SonarQube server..."
-                    curl -v http://172.17.0.2:9000/api/system/status
-                    
-                    # Install and run sonar-scanner
+                    # Install sonar-scanner
                     npm install -g sonar-scanner
+                    
+                    # Run sonar-scanner (token will be injected by withSonarQubeEnv)
                     sonar-scanner \
                     -Dsonar.projectKey=SonarQube_TP1 \
                     -Dsonar.projectName='SonarQube_TP1' \
-                    -Dsonar.host.url=http://172.17.0.2:9000 \
                     -Dsonar.sources=. \
                     -Dsonar.exclusions=node_modules/**,coverage/**,dist/**,test/**,**/*.test.js \
                     -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-                    -Dsonar.sourceEncoding=UTF-8 \
-                    -X
+                    -Dsonar.sourceEncoding=UTF-8
                     '''
                 }
             }
@@ -61,7 +57,6 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 timeout(time: 1, unit: 'MINUTES') {
-                    // Using catchError to prevent pipeline failure if quality gate check fails
                     catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                         waitForQualityGate abortPipeline: false
                     }
