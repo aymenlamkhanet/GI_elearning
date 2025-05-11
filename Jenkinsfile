@@ -4,7 +4,7 @@ pipeline {
     environment {
         NODE_VERSION = 'v23.7.0'
         DOCKER_IMAGE = "my-app:${env.BUILD_ID}"
-        // Using withSonarQubeEnv instead of credentials binding
+        SONAR_PROJECT_KEY = "SonarQube_TP1"
     }
     
     tools {
@@ -36,20 +36,27 @@ pipeline {
         
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv(
-                installationName: 'Sonarqube', 
-                credentialsId: 'sonar_token'  // Use the verified ID
-                ) {
-                sh '''
-                    sonar-scanner -X \
-                    -Dsonar.host.url=http://172.17.0.2:9000 \
-                    -Dsonar.projectKey=SonarQube_TP1 \
-                    -Dsonar.projectName='SonarQube_TP1' \
-                    -Dsonar.sources=. \
-                    -Dsonar.exclusions=node_modules/**,coverage/**,dist/**,test/**,**/*.test.js \
-                    -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-                    -Dsonar.sourceEncoding=UTF-8
-                '''
+                withSonarQubeEnv(installationName: 'Sonarqube', credentialsId: 'sonar_token') {
+                    // First ensure the project exists
+                    sh '''
+                        # We'll check if the project exists in SonarQube
+                        curl -u "${SONAR_AUTH_TOKEN}:" -X POST "http://172.17.0.2:9000/api/projects/create" \
+                          -d "name=${SONAR_PROJECT_KEY}" \
+                          -d "project=${SONAR_PROJECT_KEY}" || echo "Project may already exist"
+                    '''
+                    
+                    // Then run the scan with proper permissions
+                    sh '''
+                        sonar-scanner \
+                        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                        -Dsonar.projectName=${SONAR_PROJECT_KEY} \
+                        -Dsonar.host.url=http://172.17.0.2:9000 \
+                        -Dsonar.login=${SONAR_AUTH_TOKEN} \
+                        -Dsonar.sources=. \
+                        -Dsonar.exclusions=node_modules/**,coverage/**,dist/**,test/**,**/*.test.js \
+                        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+                        -Dsonar.sourceEncoding=UTF-8
+                    '''
                 }
             }
         }
