@@ -37,16 +37,22 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('Sonarqube') {
-                    // No need for additional credentials since they're configured in SonarQube server settings
                     sh '''
+                    # Check network connectivity to SonarQube
+                    echo "Testing connection to SonarQube server..."
+                    curl -v http://172.17.0.2:9000/api/system/status
+                    
+                    # Install and run sonar-scanner
                     npm install -g sonar-scanner
                     sonar-scanner \
                     -Dsonar.projectKey=SonarQube_TP1 \
                     -Dsonar.projectName='SonarQube_TP1' \
+                    -Dsonar.host.url=http://172.17.0.2:9000 \
                     -Dsonar.sources=. \
                     -Dsonar.exclusions=node_modules/**,coverage/**,dist/**,test/**,**/*.test.js \
                     -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-                    -Dsonar.sourceEncoding=UTF-8
+                    -Dsonar.sourceEncoding=UTF-8 \
+                    -X
                     '''
                 }
             }
