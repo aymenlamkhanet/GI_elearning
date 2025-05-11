@@ -5,7 +5,8 @@ pipeline {
         DOCKER_IMAGE = "my-app:${env.BUILD_ID}"
     }
     tools {
-        nodejs 'NodeJS 23.7.0' // Corrected tool name to match Jenkins configuration
+        nodejs 'NodeJS 23.7.0'
+        sonarRunner 'SonarQubeScanner' 
     }
     stages {
         stage('Clone Repository') {
@@ -20,6 +21,23 @@ pipeline {
                 echo 'Installing dependencies......'
                 sh 'npm --version'
                 sh 'npm install'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('Sonarqube') { // Must match EXACTLY your server name
+                    sh """
+                    ${tool('SonarQubeScanner')}/bin/sonar-scanner 
+                    -Dsonar.projectKey=SonarQube_TP1 
+                    -Dsonar.projectName='SonarQube_TP1' 
+                    -Dsonar.host.url=http://172.17.0.2:9000 
+                    -Dsonar.login=${sonartoken} 
+                    -Dsonar.sources=src 
+                    -Dsonar.language=js 
+                    -Dsonar.sourceEncoding=UTF-8
+                    """
+                }
             }
         }
         
