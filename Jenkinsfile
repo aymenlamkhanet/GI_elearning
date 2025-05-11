@@ -41,6 +41,8 @@ pipeline {
                     # Install sonar-scanner
                     npm install -g sonar-scanner
                     
+                    curl -v http://172.17.0.2:9000
+                    
                     # Run sonar-scanner (token will be injected by withSonarQubeEnv)
                     sonar-scanner \
                     -Dsonar.projectKey=SonarQube_TP1 \
