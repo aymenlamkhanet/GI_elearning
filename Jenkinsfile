@@ -3,7 +3,6 @@ pipeline {
     environment {
         NODE_VERSION = 'v23.7.0'  // Optional, but ensure it's consistent if used elsewhere
         DOCKER_IMAGE = "my-app:${env.BUILD_ID}"
-        SONAR_SCANNER_HOME = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
     }
     tools {
         nodejs 'NodeJS 23.7.0'
@@ -27,7 +26,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('Sonarqube') { // Must match EXACTLY your server name
-                    // Install sonar-scanner with npm if needed
+                    // Install and use sonar-scanner directly without tool dependency
                     sh '''
                     npm install -g sonar-scanner
                     sonar-scanner \\
@@ -68,14 +67,20 @@ pipeline {
     
     post {
         success {
-            echo 'Pipeline succeeded! 🎉'
+            node(null) {  // Ensure we're in a node context for cleanWs
+                echo 'Pipeline succeeded! 🎉'
+            }
         }
         failure {
-            echo 'Pipeline failed! ❌'
+            node(null) {  // Ensure we're in a node context for cleanWs
+                echo 'Pipeline failed! ❌'
+            }
         }
         always {
-            echo 'Cleaning up workspace...'
-            cleanWs()
+            node(null) {  // Ensure we're in a node context for cleanWs
+                echo 'Cleaning up workspace...'
+                cleanWs()
+            }
         }
     }
 }
