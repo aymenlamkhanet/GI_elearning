@@ -32,6 +32,20 @@ pipeline {
                 sh 'npm test || echo "Tests failed but continuing"'
             }
         }
+
+        stage('Debug Network') {
+            steps {
+                sh 'docker ps'
+                sh 'docker network ls'
+                sh 'docker network inspect bridge'
+            }
+        }
+
+        stage('Test SonarQube Connection') {
+            steps {
+                sh 'curl -v http://172.17.0.2:9000/api/system/status'
+            }
+        }
         
         stage('SonarQube Analysis') {
             steps {
@@ -41,6 +55,7 @@ pipeline {
                 ) {
                     sh '''
                         sonar-scanner -X \
+                        -Dsonar.host.url=http://172.17.0.2:9000 \
                         -Dsonar.projectKey=SonarQube_TP1 \
                         -Dsonar.projectName='SonarQube_TP1' \
                         -Dsonar.sources=. \
