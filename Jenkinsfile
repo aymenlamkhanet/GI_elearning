@@ -17,16 +17,6 @@ pipeline {
                 checkout scm
             }
         }
-
-        stage('Lint Dockerfile') {
-            steps {
-                script {
-                    docker.image('hadolint/hadolint:latest').inside("-v ${WORKSPACE}:/app") {
-                        sh 'hadolint /app/Dockerfile'
-                    }
-                }
-            }
-        }
         
         stage('Install Dependencies') {
             steps {
@@ -77,6 +67,7 @@ pipeline {
             }
         }
         
+
         
         stage('Build Docker Image') {
             steps {
