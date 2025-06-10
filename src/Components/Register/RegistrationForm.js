@@ -17,6 +17,9 @@ const RegistrationForm = () => {
     niveau: "GI1",
     specialty: "", // This will be mapped to 'module' for professors
     role: "student",
+    fireScore: 0,
+    contentInteractions : 0,
+    forumContributions:0,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -96,6 +99,9 @@ const RegistrationForm = () => {
             email: response.data.email,
             role: response.data.role,
             nom: response.data.nom,
+            fireScore: response.data.fireScore,
+            contentInteractions: response.data.contentInteractions,
+            forumContributions: response.data.forumContributions,
           })
         );
 

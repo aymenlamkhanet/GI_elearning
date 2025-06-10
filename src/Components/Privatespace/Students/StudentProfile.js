@@ -19,6 +19,7 @@ import {
   FiThumbsUp,
 } from "react-icons/fi";
 import defaultAvatar from "../../Products/imgs/pexels-photo-771742.jpeg";
+import { FiBarChart2 } from "react-icons/fi";
 
 
 const StudentProfile = () => {
@@ -37,10 +38,20 @@ const StudentProfile = () => {
     mostActiveCategory: "Aucune",
     likesReceived: 0,
   });
+  const [statistics, setStatistics] = useState({
+    accountCreationDate: "",
+    contentInteractions: 0,
+    fireScore: 0,
+    forumContributions: 0,
+    lastActiveDate: "",
+  });
 
+  
   useEffect(() => {
     fetchStudentData();
   }, []);
+
+  
 
 
   useEffect(() => {
@@ -67,9 +78,23 @@ const StudentProfile = () => {
       const response = await axios.get(
         `http://localhost:8084/api/etudiant/${userData.id}`
       );
+      console.log("user all infos", response.data);
+      console.log("Setting statistics with:", {
+        accountCreationDate: response.data.accountCreationDate,
+        contentInteractions: response.data.contentInteractions,
+        fireScore: response.data.fireScore,
+        forumContributions: response.data.forumContributions,
+        lastActiveDate: response.data.lastActiveDate,
+      });
       setStudent(response.data);
       setFormData(response.data);
-
+      setStatistics({
+        accountCreationDate: response.data.accountCreationDate,
+        contentInteractions: response.data.contentInteractions,
+        fireScore: response.data.fireScore,
+        forumContributions: response.data.forumContributions,
+        lastActiveDate: response.data.lastActiveDate,
+      });
       // Fetch forum data
       await fetchForumData(userData.id);
 
@@ -319,6 +344,17 @@ const StudentProfile = () => {
             >
               <MessageSquare className="mr-2 w-4 h-4 pointer-events-none" />
               Forum
+            </button>
+            <button
+              onClick={() => setActiveTab("stats")}
+              className={`px-4 py-2 mr-4 rounded-lg flex items-center transition-all whitespace-nowrap cursor-pointer relative z-30 ${
+                activeTab === "stats"
+                  ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white"
+                  : "text-gray-400 hover:text-white hover:bg-gray-700/30"
+              }`}
+            >
+              <FiBarChart2 className="mr-2 w-4 h-4" />
+              Statistiques
             </button>
           </div>
         </div>
@@ -735,6 +771,111 @@ const StudentProfile = () => {
                   <p className="text-gray-400">
                     C'est la catégorie où vous êtes le plus actif dans le forum
                   </p>
+                </div>
+              </div>
+            </div>
+          )}
+          {activeTab === "stats" && (
+            <div className="p-6 relative z-10">
+              <h2 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-6">
+                Mes Statistiques Générales
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                <div className="bg-gray-900/50 border border-gray-700/50 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-gray-300">Date de Création</h3>
+                    <FiUser className="text-blue-400" />
+                  </div>
+                  <div className="text-xl font-bold text-white">
+                    {new Date(
+                      statistics.accountCreationDate
+                    ).toLocaleDateString("fr-FR")}
+                  </div>
+                  <div className="text-sm text-gray-400">Compte créé</div>
+                </div>
+
+                <div className="bg-gray-900/50 border border-gray-700/50 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-gray-300">Dernière Activité</h3>
+                    <FiActivity className="text-green-400" />
+                  </div>
+                  <div className="text-xl font-bold text-white">
+                    {new Date(statistics.lastActiveDate).toLocaleDateString(
+                      "fr-FR"
+                    )}
+                  </div>
+                  <div className="text-sm text-gray-400">
+                    Dernière connexion
+                  </div>
+                </div>
+
+                <div className="bg-gray-900/50 border border-gray-700/50 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-gray-300">Score d'Engagement</h3>
+                    <FiAward className="text-yellow-400" />
+                  </div>
+                  <div className="text-3xl font-bold text-white">
+                    {statistics.fireScore}
+                  </div>
+                  <div className="text-sm text-gray-400">Fire Score</div>
+                  <div className="mt-3 h-2 bg-gray-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-yellow-500 to-orange-500"
+                      style={{
+                        width: `${Math.min(statistics.fireScore / 5, 100)}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+
+              
+
+              <div className="bg-gray-900/50 border border-gray-700/50 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-white mb-4">
+                  Résumé d'Activité
+                </h3>
+                <div className="flex flex-col gap-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">
+                      Jours depuis création:
+                    </span>
+                    <span className="text-white font-medium">
+                      {Math.floor(
+                        (new Date() -
+                          new Date(statistics.accountCreationDate)) /
+                          (1000 * 60 * 60 * 24)
+                      )}{" "}
+                      jours
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Interactions/jour:</span>
+                    <span className="text-white font-medium">
+                      {(
+                        statistics.contentInteractions /
+                        Math.floor(
+                          (new Date() -
+                            new Date(statistics.accountCreationDate)) /
+                            (1000 * 60 * 60 * 24)
+                        )
+                      ).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Score/jour:</span>
+                    <span className="text-white font-medium">
+                      {(
+                        statistics.fireScore /
+                        Math.floor(
+                          (new Date() -
+                            new Date(statistics.accountCreationDate)) /
+                            (1000 * 60 * 60 * 24)
+                        )
+                      ).toFixed(2)}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

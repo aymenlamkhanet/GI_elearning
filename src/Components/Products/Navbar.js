@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { getBadgeInfo } from "./badgeUtils";
 import {
   FiHome,
   FiBook,
@@ -8,12 +9,10 @@ import {
   FiMenu,
   FiX,
   FiChevronDown,
-  FiUser,
-  FiLogOut,
   FiLogIn,
   FiMessageSquare, // Nouvelle icône ajoutée pour le forum
 } from "react-icons/fi";
-
+import * as FiIcons from "react-icons/fi";
 import logo from "./imgs/alien-svgrepo-com.svg";
 import defaultAvatar from "./imgs/pexels-photo-771742.jpeg";
 
@@ -39,7 +38,20 @@ const Navbar = () => {
           email: userData.email,
           role: userData.role,
           profileImage: null,
+          fireScore: userData.fireScore ?? 0,
+          contentInteractions: userData.contentInteractions ?? 0,
+          forumContributions: userData.forumContributions ?? 0,
         });
+
+        // Right before setUser()
+        console.log("Processed user data:", {
+          ...userData,
+          fireScore: userData.fireScore ?? 0,
+          contentInteractions: userData.contentInteractions ?? 0,
+          forumContributions: userData.forumContributions ?? 0,
+        });
+
+
       } else {
         setUser(null);
       }
@@ -144,6 +156,70 @@ const Navbar = () => {
     }
   };
 
+  const BadgeDisplay = ({
+    fireScore = 0,
+    contentInteractions = 0,
+    forumContributions = 0,
+  }) => {
+    if (fireScore === undefined || fireScore === null) return null;
+  
+    const { mainBadge, additionalBadges } = getBadgeInfo(
+      fireScore,
+      contentInteractions,
+      forumContributions
+    );
+  
+    const isSpecialBadge = ["gold", "purple"].includes(mainBadge.color);
+  
+    // Helper to render an icon by name
+    const renderIcon = (iconName) => {
+      const IconComponent = FiIcons[iconName];
+      return IconComponent ? <IconComponent size={14} /> : null;
+    };
+  
+    return (
+      <div className="flex items-center gap-2">
+        {/* Main Badge */}
+        <div
+          className={`flex items-center px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-300 transform hover:scale-105 ${
+            mainBadge.color === "gold"
+              ? "bg-yellow-900/60 text-yellow-200 border-yellow-700 shadow-md shadow-yellow-800/20"
+              : mainBadge.color === "purple"
+              ? "bg-purple-900/60 text-purple-200 border-purple-700 shadow-md shadow-purple-800/20"
+              : mainBadge.color === "blue"
+              ? "bg-blue-900/60 text-blue-200 border-blue-700"
+              : mainBadge.color === "orange"
+              ? "bg-orange-900/60 text-orange-200 border-orange-700"
+              : mainBadge.color === "green"
+              ? "bg-green-900/60 text-green-200 border-green-700"
+              : "bg-gray-800 text-gray-300 border-gray-700"
+          }`}
+        >
+          <span className="mr-1.5">{renderIcon(mainBadge.icon)}</span>
+          <span>{mainBadge.tier}</span>
+        </div>
+  
+        {/* Additional Badges */}
+        {additionalBadges.map((badge, index) => (
+          <div
+            key={index}
+            className="flex items-center justify-center h-6 w-6 rounded-full text-xs bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700 hover:text-white transition-colors duration-200 cursor-default"
+            title={badge.title}
+          >
+            {renderIcon(badge.icon)}
+          </div>
+        ))}
+  
+        {/* Points for Special Badges */}
+        {isSpecialBadge && (
+          <div className="text-xs text-gray-400 font-normal select-none ml-1">
+            {mainBadge.score} pts
+          </div>
+        )}
+      </div>
+    );
+  };
+  
   return (
     <nav className="bg-gray-900 border-b border-white/10 backdrop-blur-md bg-opacity-80 sticky top-0 z-50">
       <div className="container mx-auto px-4">
@@ -227,7 +303,18 @@ const Navbar = () => {
                         className="h-8 w-8 rounded-full object-cover relative z-10 border border-gray-700"
                       />
                     </div>
-                    <span className="ml-2">{user.username}</span>
+                    <div className="ml-2 flex flex-col">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm whitespace-nowrap">
+                          {user.username}
+                        </span>
+                        <BadgeDisplay
+                          fireScore={user.fireScore}
+                          contentInteractions={user.contentInteractions}
+                          forumContributions={user.forumContributions}
+                        />
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div className="flex items-center">
@@ -285,11 +372,21 @@ const Navbar = () => {
                     alt="User"
                     className="h-10 w-10 rounded-full object-cover border border-gray-700 mr-3"
                   />
-                  <div>
-                    <div className="text-white font-medium">
-                      {user.username || user.nom || user.email.split("@")[0]}
+                  <div className="bg-gray-800 p-4 rounded-xl shadow-md w-full max-w-xs">
+                    <div className="text-center mb-3">
+                      <div className="text-white text-lg font-semibold">
+                        {user.username || user.nom || user.email.split("@")[0]}
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-400">{user.email}</div>
+                    {user && (
+                      <div className="flex justify-center">
+                        <BadgeDisplay
+                          fireScore={user.fireScore}
+                          contentInteractions={user.contentInteractions}
+                          forumContributions={user.forumContributions}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex mt-3 space-x-2">
