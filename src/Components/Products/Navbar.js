@@ -11,10 +11,11 @@ import {
   FiUser,
   FiLogOut,
   FiLogIn,
+  FiMessageSquare, // Nouvelle icône ajoutée pour le forum
 } from "react-icons/fi";
 
 import logo from "./imgs/alien-svgrepo-com.svg";
-import defaultAvatar from "./imgs/pexels-photo-771742.jpeg"; // Default avatar image
+import defaultAvatar from "./imgs/pexels-photo-771742.jpeg";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,62 +24,49 @@ const Navbar = () => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check for authentication on component mount
   useEffect(() => {
     checkAuthentication();
   }, []);
 
-  // Function to check if user is authenticated
   const checkAuthentication = async () => {
     try {
-      // Check if user data exists in localStorage
       const userStr = localStorage.getItem("user");
-
       if (userStr) {
-        // Parse the user data from localStorage
         const userData = JSON.parse(userStr);
-
-        // Set the user state with data from localStorage
         setUser({
           id: userData.id,
-          username: userData.nom || userData.email.split("@")[0], // Use nom or fallback to email username part
+          username: userData.nom || userData.email.split("@")[0],
           email: userData.email,
           role: userData.role,
-          // Since profile image is not in localStorage, you might need to fetch it or use default
-          profileImage: null, // We'll use the default avatar defined earlier
+          profileImage: null,
         });
       } else {
-        // No user in localStorage, user is not authenticated
         setUser(null);
       }
     } catch (error) {
       console.error("Authentication check failed:", error);
-      localStorage.removeItem("user"); // Clear invalid user data
+      localStorage.removeItem("user");
       setUser(null);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Function to handle logout
   const handleLogout = () => {
     localStorage.removeItem("user");
     setUser(null);
-    // Optional: Redirect to home or login page
     window.location.href = "/";
   };
 
-  // Function to handle navigation to profile or login
   const handleProfileAction = () => {
     if (user) {
-      // If user is logged in, navigate to profile
       window.location.href = "/StudentProfile";
     } else {
-      // If not logged in, navigate to login page
       window.location.href = "/register";
     }
   };
 
+  // Ajout du nouvel item "Forum" dans le menu
   const menuItems = [
     {
       title: "Accueil",
@@ -123,6 +111,12 @@ const Navbar = () => {
           link: "/GI3CourseDashboard",
         },
       ],
+    },
+    // NOUVEL ITEM FORUM AJOUTÉ ICI
+    {
+      title: "Forum",
+      icon: <FiMessageSquare />, // Utilisation de la nouvelle icône
+      link: "/forum", // Lien vers la page du forum
     },
     {
       title: "Infos MI",
@@ -224,7 +218,6 @@ const Navbar = () => {
                     <span>Loading...</span>
                   </div>
                 ) : user ? (
-                  // User is authenticated - show profile image
                   <div className="flex items-center">
                     <div className="relative">
                       <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-sm opacity-60"></div>
@@ -237,7 +230,6 @@ const Navbar = () => {
                     <span className="ml-2">{user.username}</span>
                   </div>
                 ) : (
-                  // User is not authenticated - show connection button
                   <div className="flex items-center">
                     <div className="relative flex items-center justify-center h-8 w-8 bg-gray-800 rounded-full border border-gray-700 mr-2">
                       <FiLogIn className="text-blue-400" />
@@ -251,7 +243,6 @@ const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
-            {/* Mobile User Profile Icon */}
             <div className="mr-4 cursor-pointer" onClick={handleProfileAction}>
               {isLoading ? (
                 <div className="h-8 w-8 bg-gray-700 rounded-full animate-pulse"></div>
@@ -286,7 +277,6 @@ const Navbar = () => {
       {isOpen && (
         <div className="md:hidden bg-gray-900 border-t border-white/10">
           <div className="container mx-auto px-4 py-2">
-            {/* User profile section for mobile */}
             {user ? (
               <div className="px-4 py-3 border-b border-white/10 mb-2">
                 <div className="flex items-center">

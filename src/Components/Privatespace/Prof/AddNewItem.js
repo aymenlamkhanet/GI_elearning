@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 const AddNewItem = () => {
-  const [selectedType, setSelectedType] = useState("cours");
+  const [selectedType, setSelectedType] = useState("cour");
   const [formData, setFormData] = useState({
     titre: "",
     description: "",
@@ -79,7 +79,7 @@ const AddNewItem = () => {
     formDataToSend.append("niveau", formData.niveau);
     formDataToSend.append("ratingAvg", formData.ratingAvg);
 
-    if (selectedType === "cours") {
+    if (selectedType === "cour") {
       formDataToSend.append("duree", formData.duree);
       formDataToSend.append("links", JSON.stringify(formData.links));
     }
@@ -160,9 +160,9 @@ const AddNewItem = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <button
               type="button"
-              onClick={() => setSelectedType("cours")}
+              onClick={() => setSelectedType("cour")}
               className={`p-4 rounded-lg flex flex-col items-center hover:bg-purple-800/20 transition-all ${
-                selectedType === "cours"
+                selectedType === "cour"
                   ? "bg-purple-900/30 border border-purple-500/50 text-purple-300"
                   : "bg-gray-700/20 border border-gray-700 text-gray-300"
               }`}
@@ -173,9 +173,9 @@ const AddNewItem = () => {
 
             <button
               type="button"
-              onClick={() => setSelectedType("exercice")}
+              onClick={() => setSelectedType("exercise")}
               className={`p-4 rounded-lg flex flex-col items-center hover:bg-blue-800/20 transition-all ${
-                selectedType === "exercice"
+                selectedType === "exercise"
                   ? "bg-blue-900/30 border border-blue-500/50 text-blue-300"
                   : "bg-gray-700/20 border border-gray-700 text-gray-300"
               }`}
@@ -324,7 +324,7 @@ const AddNewItem = () => {
               />
             </div>
 
-            {selectedType === "cours" && (
+            {selectedType === "cour" && (
               <div>
                 <label
                   className="block text-sm text-gray-400 mb-1"
@@ -367,7 +367,7 @@ const AddNewItem = () => {
               </div>
             </div>
 
-            {selectedType === "cours" && (
+            {selectedType === "cour" && (
               <div>
                 <label
                   className="block text-sm text-gray-400 mb-1"

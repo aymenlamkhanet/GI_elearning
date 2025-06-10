@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Navbar from "../Products/Navbar";
 import {
   MessageCircle,
   ThumbsUp,
@@ -20,8 +21,21 @@ const QuestionsForum = () => {
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
+
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      const userData = JSON.parse(userStr);
+      setCurrentUser({
+        id: userData.id,
+        username: userData.nom || userData.email.split("@")[0],
+        email: userData.email,
+        role: userData.role,
+      });
+    }
+
     const fetchQuestions = async () => {
       try {
         const response = await fetch(
@@ -31,7 +45,7 @@ const QuestionsForum = () => {
         const questionsWithReplies = await Promise.all(
           data.content.map(async (question) => {
             const res = await fetch(
-              `${API_BASE_URL}/questions/${question.id}/reponses`
+              `${API_BASE_URL}/res/questions/${question.id}/reponses`
             );
             const reponses = await res.json();
             return { ...question, replies: reponses.length };
@@ -81,8 +95,8 @@ const QuestionsForum = () => {
     const [newQuestion, setNewQuestion] = useState({
       titre: "",
       contenu: "",
-      department: "info",
-      // Tags removed as it's not in the Question entity
+      department: "Informatique",
+      
     });
 
     const handleChange = (e) => {
@@ -92,6 +106,10 @@ const QuestionsForum = () => {
 
     const handleSubmit = async (e) => {
       e.preventDefault();
+      if (!currentUser) {
+        console.error("User not authenticated");
+        return;
+      }
 
       try {
         const response = await fetch(`${API_BASE_URL}/questions`, {
@@ -104,8 +122,8 @@ const QuestionsForum = () => {
             contenu: newQuestion.contenu,
             department: newQuestion.department,
             dateCreation: new Date().toISOString(),
-            userId: "user123", // Placeholder - should come from auth
-            userName: "User", // Placeholder - should come from auth
+            userId: currentUser.id,
+            userName: currentUser.username,
             voteCount: 0,
             answerCount: 0,
             viewCount: 0,
@@ -184,7 +202,6 @@ const QuestionsForum = () => {
                     required
                   >
                     <option value="info">Informatique</option>
-                    <option value="maths">Mathématiques</option>
                   </select>
                 </div>
               </div>
@@ -219,7 +236,7 @@ const QuestionsForum = () => {
       const fetchReplies = async () => {
         try {
           const response = await fetch(
-            `${API_BASE_URL}/questions/${question.id}/reponses`
+            `${API_BASE_URL}/res/questions/${question.id}/reponses`
           );
           const data = await response.json();
           setReplies(data);
@@ -234,10 +251,14 @@ const QuestionsForum = () => {
     const handleReplySubmit = async (e) => {
       e.preventDefault();
       if (!reply.trim()) return;
+      if (!currentUser) {
+        console.error("User not authenticated");
+        return;
+      }
 
       try {
         const response = await fetch(
-          `${API_BASE_URL}/questions/${question.id}/reponses`,
+          `${API_BASE_URL}/res/questions/${question.id}/reponses`,
           {
             method: "POST",
             headers: {
@@ -246,8 +267,8 @@ const QuestionsForum = () => {
             body: JSON.stringify({
               contenu: reply,
               dateCreation: new Date().toISOString(),
-              userId: "user123", // Placeholder - should come from auth
-              userName: "User", // Placeholder - should come from auth
+              userId: currentUser.id,
+              userName: currentUser.username,
               voteCount: 0,
               isAccepted: false,
               questionId: question.id,
@@ -295,7 +316,7 @@ const QuestionsForum = () => {
       try {
         const endpoint = upvote ? "upvote" : "downvote";
         const response = await fetch(
-          `${API_BASE_URL}/reponses/${replyId}/${endpoint}`,
+          `${API_BASE_URL}/res/reponses/${replyId}/${endpoint}`,
           { method: "POST" }
         );
 
@@ -337,7 +358,7 @@ const QuestionsForum = () => {
               <span className="px-2 py-1 bg-purple-800/50 rounded-full text-xs">
                 {question.department === "info"
                   ? "Informatique"
-                  : "Mathématiques"}
+                  : "Informatique"}
               </span>
             </div>
           </div>
@@ -442,6 +463,7 @@ const QuestionsForum = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
+      <Navbar />
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
@@ -488,26 +510,6 @@ const QuestionsForum = () => {
               >
                 Tous
               </button>
-              <button
-                onClick={() => handleFilterChange("info")}
-                className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${
-                  filter === "info"
-                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                }`}
-              >
-                Informatique
-              </button>
-              <button
-                onClick={() => handleFilterChange("maths")}
-                className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${
-                  filter === "maths"
-                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                }`}
-              >
-                Mathématiques
-              </button>
             </div>
           </div>
         )}
@@ -550,7 +552,7 @@ const QuestionsForum = () => {
                         <span className="px-2 py-1 bg-purple-800/50 rounded-full text-xs">
                           {question.department === "info"
                             ? "Informatique"
-                            : "Mathématiques"}
+                            : "Informatique"}
                         </span>
                       </div>
                     </div>
