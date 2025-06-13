@@ -1,95 +1,117 @@
-
 // ProductGrid.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios"; // Import Axios
 import ProductCard from "./ProductCard";
 import { FiFilter, FiSearch, FiChevronDown } from "react-icons/fi";
-import img from "./imgs/download.jpeg";
-import img1 from "./imgs/images.jpeg"
-import img2 from "./imgs/download (1).jpeg";
-import img3 from "./imgs/download (2).jpeg";
-import img4 from "./imgs/download (3).jpeg";
-import img5 from "./imgs/download.png";
 
 const ProductGrid = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [selectedProductId, setSelectedProductId] = useState(null);
-
-  const products = [
-    {
-      id: 1,
-      title: "Advanced Algorithms",
-      type: "Course",
-      category: "Computer Science",
-      difficulty: "Advanced",
-      rating: 4.5,
-      duration: "6h 30m",
-      image: img,
-      reviews: 42,
-    },
-    {
-      id: 2,
-      title: "Web Development Basics",
-      type: "Course",
-      category: "Frontend",
-      difficulty: "Beginner",
-      rating: 4.8,
-      duration: "8h 15m",
-      image: img1,
-      reviews: 38,
-    },
-    {
-      id: 3,
-      title: "Database Systems",
-      type: "Book",
-      category: "Backend",
-      difficulty: "Intermediate",
-      rating: 4.2,
-      duration: "320 pages",
-      image: img2,
-      reviews: 25,
-    },
-    {
-      id: 4,
-      title: "Machine Learning Exam",
-      type: "Exam",
-      category: "AI",
-      difficulty: "Advanced",
-      rating: 4.0,
-      duration: "2h 00m",
-      image: img3,
-      reviews: 18,
-    },
-    {
-      id: 5,
-      title: "Python Exercises",
-      type: "Exercise",
-      category: "Programming",
-      difficulty: "Beginner",
-      rating: 4.6,
-      duration: "50 problems",
-      image: img4,
-      reviews: 56,
-    },
-    {
-      id: 6,
-      title: "System Design Guide",
-      type: "Guide",
-      category: "Architecture",
-      difficulty: "Intermediate",
-      rating: 4.7,
-      duration: "4h 45m",
-      image: img5,
-      reviews: 33,
-    },
-  ];
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const filters = ["All", "Course", "Book", "Exam", "Exercise", "Guide"];
   const difficulties = ["All", "Beginner", "Intermediate", "Advanced"];
 
   const [selectedDifficulty, setSelectedDifficulty] = useState("All");
 
+  // Helper function to map difficulty levels
+  const mapDifficulty = (niveau) => {
+    const levels = {
+      Débutant: "Beginner",
+      Intermédiaire: "Intermediate",
+      Avancé: "Advanced",
+    };
+    return levels[niveau] || niveau;
+  };
+
+  // Fetch data from API endpoints using Axios
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch from all endpoints concurrently
+        const [exercisesRes, coursesRes, examsRes] = await Promise.all([
+          axios.get("http://localhost:8084/api/exercices"),
+          axios.get("http://localhost:8084/api/cours"),
+          axios.get("http://localhost:8084/api/examens"),
+        ]);
+
+        // Map API data to consistent product format
+        // In ProductGrid.js - Update the mappedProducts section
+        const mappedProducts = [
+          ...coursesRes.data.map((course) => ({
+            id: course._id,
+            title: course.titre,
+            description: course.description || "No description available", // Add this line
+            type: "Course",
+            category: course.module || "Computer Science",
+            difficulty: mapDifficulty(course.niveau) || "Intermediate",
+            rating: course.ratingAvg?.$numberLong
+              ? parseFloat(course.ratingAvg.$numberLong)
+              : 4.0,
+            duration: course.duration ? `${course.duration} min` : "N/A",
+            image:
+              course.imageUrl ||
+              "https://via.placeholder.com/300x200?text=Course",
+            reviews: course.reviewCount || 0,
+            fichierId: course.fichierId || null, // Add this line
+          })),
+          ...exercisesRes.data.map((exercise) => ({
+            id: exercise._id,
+            title: exercise.titre,
+            description: exercise.description || "No description available", // Add this line
+            type: "Exercise",
+            category: exercise.module || "Programming",
+            difficulty: mapDifficulty(exercise.niveau) || "Beginner",
+            rating: exercise.ratingAvg?.$numberLong
+              ? parseFloat(exercise.ratingAvg.$numberLong)
+              : 4.5,
+            duration: exercise.problemCount
+              ? `${exercise.problemCount} problems`
+              : "N/A",
+            image:
+              exercise.imageUrl ||
+              "https://via.placeholder.com/300x200?text=Exercise",
+            reviews: exercise.reviewCount || 0,
+            fichierId: exercise.fichierId || null, // Add this line
+          })),
+          ...examsRes.data.map((exam) => ({
+            id: exam._id,
+            title: exam.titre,
+            description: exam.description || "No description available", // Add this line
+            type: "Exam",
+            category: exam.module || "Testing",
+            difficulty: mapDifficulty(exam.niveau) || "Advanced",
+            rating: exam.ratingAvg?.$numberLong
+              ? parseFloat(exam.ratingAvg.$numberLong)
+              : 3.8,
+            duration: exam.timeLimit ? `${exam.timeLimit} min` : "N/A",
+            image:
+              exam.imageUrl || "https://via.placeholder.com/300x200?text=Exam",
+            reviews: exam.reviewCount || 0,
+            fichierId: exam.fichierId || null, // Add this line
+          })),
+        ];
+
+        setProducts(mappedProducts);
+        setLoading(false);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch data");
+        setLoading(false);
+        console.error("Error fetching data:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Filter products based on search and filters
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
       product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -103,13 +125,7 @@ const ProductGrid = () => {
   });
 
   const handleCardSelect = (productId) => {
-    // If the same card is clicked again, unselect it
-    if (selectedProductId === productId) {
-      setSelectedProductId(null);
-    } else {
-      // Otherwise select the new card (and unselect the previous one)
-      setSelectedProductId(productId);
-    }
+    setSelectedProductId(selectedProductId === productId ? null : productId);
   };
 
   return (
@@ -207,25 +223,41 @@ const ProductGrid = () => {
           </div>
         </div>
 
+        {/* Loading and Error States */}
+        {loading && (
+          <div className="col-span-3 text-center py-12">
+            <p className="text-gray-400 text-lg">Loading resources...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="col-span-3 text-center py-12">
+            <p className="text-red-500 text-lg">Error: {error}</p>
+            <p className="text-gray-400 mt-2">Please try again later</p>
+          </div>
+        )}
+
         {/* Product Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <ProductCard 
-                key={product.id} 
-                product={product} 
-                isSelected={selectedProductId === product.id}
-                onSelect={handleCardSelect}
-              />
-            ))
-          ) : (
-            <div className="col-span-3 text-center py-12">
-              <p className="text-gray-400 text-lg">
-                No results found. Try adjusting your search or filters.
-              </p>
-            </div>
-          )}
-        </div>
+        {!loading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  isSelected={selectedProductId === product.id}
+                  onSelect={handleCardSelect}
+                />
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-12">
+                <p className="text-gray-400 text-lg">
+                  No results found. Try adjusting your search or filters.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

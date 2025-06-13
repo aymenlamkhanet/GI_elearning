@@ -19,6 +19,7 @@ import QuestionsForum from "./Components/Discussion/QuestionsForum";
 import GI2CourseDashboard from "./Components/Cours&Exos/GI2CourseDashboard";
 import GI3CourseDashboard from "./Components/Cours&Exos/GI3CourseDashboard";
 import StudentProfile from "./Components/Privatespace/Students/StudentProfile";
+import SearchAllResources from "./Components/Privatespace/Students/SearchAllResources";
 import axios from "axios";
 import ExerciseDashboard from "./Components/Dashboard/ExerciseDashboard";
 
@@ -40,6 +41,7 @@ const App = () => {
   return (
     <Router>
       <Routes>
+        <Route path="/searchitem" element={<SearchAllResources />} />
         <Route path="/" element={<LandingPage />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
         <Route path="/ExosDashboard" element={<ExerciseDashboard />} />

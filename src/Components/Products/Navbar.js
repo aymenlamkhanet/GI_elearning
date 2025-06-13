@@ -72,8 +72,19 @@ const Navbar = () => {
 
   const handleProfileAction = () => {
     if (user) {
-      window.location.href = "/StudentProfile";
+      // Check user role and redirect accordingly
+      if (user.role === "ROLE_CHEF_DEPART") {
+        window.location.href = "/admindashboard";
+      } else if (user.role === "ROLE_PROFESSEUR") {
+        window.location.href = "/profdashboard";
+      } else if (user.role === "ROLE_ETUDIANT") {
+        window.location.href = "/StudentProfile";
+      } else {
+        // Default fallback for unknown roles
+        window.location.href = "/";
+      }
     } else {
+      // No user logged in - go to register page
       window.location.href = "/register";
     }
   };
